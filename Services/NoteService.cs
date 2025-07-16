@@ -1,7 +1,4 @@
-using Notes.Models;
-
 namespace Notes.Services;
-
 
 public class NoteService
 {

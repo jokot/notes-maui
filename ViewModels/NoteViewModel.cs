@@ -1,5 +1,3 @@
-using Notes.Services;
-
 namespace Notes.ViewModels;
 
 [QueryProperty(nameof(Note), nameof(Note))]

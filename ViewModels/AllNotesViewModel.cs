@@ -1,6 +1,3 @@
-using Notes.Services;
-using Notes.Views;
-
 namespace Notes.ViewModels;
 
 public partial class AllNotesViewModel : BaseViewModel

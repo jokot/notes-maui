@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Notes.Services;
-using Notes.ViewModels;
-using Notes.Views;
-
-namespace Notes;
+﻿namespace Notes;
 
 public static class MauiProgram
 {

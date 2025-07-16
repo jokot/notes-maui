@@ -4,4 +4,6 @@ global using System.Collections.ObjectModel;
 global using System.Diagnostics;
 global using Notes.Models;
 global using Notes.ViewModels;
-global using System.ComponentModel;
+global using Microsoft.Extensions.Logging;
+global using Notes.Services;
+global using Notes.Views;

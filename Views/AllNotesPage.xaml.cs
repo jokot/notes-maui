@@ -1,5 +1,3 @@
-using Notes.ViewModels;
-
 namespace Notes.Views;
 
 public partial class AllNotesPage : ContentPage

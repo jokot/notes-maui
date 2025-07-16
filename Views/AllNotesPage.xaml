@@ -16,47 +16,59 @@
     <RefreshView
         Command="{Binding RefreshNotesCommand}"
         IsRefreshing="{Binding IsRefreshing}">
-        <!-- Display notes in a list -->
-        <CollectionView
-            x:Name="notesCollection"
-            ItemsSource="{Binding Notes}"
-            Margin="20"
-            SelectionMode="None">
+        <Grid>
+            <!-- Display notes in a list -->
+            <CollectionView
+                x:Name="notesCollection"
+                ItemsSource="{Binding Notes}"
+                Margin="20"
+                SelectionMode="None">
 
-            <CollectionView.EmptyView>
-                <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
-                    <Label Text="No notes available"
-                           FontSize="20"
-                           HorizontalOptions="Center"/>
-                    <Button Text="Add Note"
-                            Command="{Binding AddNoteCommand}"
-                            HorizontalOptions="Center"/>
-                </StackLayout>
-            </CollectionView.EmptyView>
-
-            <!-- Designate how the collection of items are laid out -->
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
-            </CollectionView.ItemsLayout>
-
-            <!-- Define the appearance of each item in the list -->
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Note">
-                    <StackLayout>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
-                                CommandParameter="{Binding .}"/>
-                        </StackLayout.GestureRecognizers>
-
-                        <Label Text="{Binding Text}"
-                               FontSize="22"/>
-                        <Label Text="{Binding Date}"
-                               FontSize="14"
-                               TextColor="Silver"/>
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            Spacing="20">
+                        <Label Text="No notes available"
+                               FontSize="20"
+                               HorizontalOptions="Center"/>
+                        <Button Text="Add Note"
+                                Command="{Binding AddNoteCommand}"
+                                HorizontalOptions="Center"/>
                     </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                </CollectionView.EmptyView>
+
+                <!-- Designate how the collection of items are laid out -->
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"
+                            ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <!-- Define the appearance of each item in the list -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Note">
+                        <StackLayout>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </StackLayout.GestureRecognizers>
+
+                            <Label Text="{Binding Text}"
+                                   FontSize="22"/>
+                            <Label Text="{Binding Date}"
+                                   FontSize="14"
+                                   TextColor="Silver"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator
+                IsVisible="{Binding IsBusy}"
+                IsRunning="{Binding IsBusy}"
+                Color="{StaticResource Primary}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+        </Grid>
     </RefreshView>
 </ContentPage>

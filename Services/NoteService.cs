@@ -31,7 +31,21 @@ public class NoteService
         return [.. noteList.OrderBy(note => note.Date)];
     }
 
-    public async void WriteNote(String filename, string text)
+    public async Task<Note> GetNote(string filename)
+    {
+        Models.Note note = new Models.Note();
+        note.Filename = filename;
+
+        if (File.Exists(filename))
+        {
+            note.Date = File.GetCreationTime(filename);
+            note.Text = await File.ReadAllTextAsync(filename);
+        }
+
+        return note;
+    }
+
+    public async void SaveNote(String filename, string text)
     {
         await File.WriteAllTextAsync(filename, text);
     }

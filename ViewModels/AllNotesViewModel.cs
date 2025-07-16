@@ -66,6 +66,11 @@ public partial class AllNotesViewModel : BaseViewModel
             return;
 
         // Should navigate to "NotePage?ItemId=path\on\device\XYZ.notes.txt"
-        await Shell.Current.GoToAsync($"{nameof(NotePage)}?{nameof(NotePage.ItemId)}={note.Filename}");
+        // await Shell.Current.GoToAsync($"{nameof(NotePage)}?{nameof(NotePage.ItemId)}={note.Filename}");
+
+        await Shell.Current.GoToAsync(nameof(NotePage), true, new Dictionary<string, object>
+        {
+            { nameof(Note), note }
+        });
     }
 }

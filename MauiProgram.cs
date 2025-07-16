@@ -19,7 +19,7 @@ public static class MauiProgram
 
 		builder.Services.AddSingleton<NoteService>();
 		builder.Services.AddSingleton<AllNotesViewModel>();
-
+		builder.Services.AddTransient<NoteViewModel>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

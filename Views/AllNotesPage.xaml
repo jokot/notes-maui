@@ -26,8 +26,8 @@
 
                 <CollectionView.EmptyView>
                     <StackLayout VerticalOptions="Center"
-                            HorizontalOptions="Center"
-                            Spacing="20">
+                                 HorizontalOptions="Center"
+                                 Spacing="20">
                         <Label Text="No notes available"
                                FontSize="20"
                                HorizontalOptions="Center"/>
@@ -40,7 +40,7 @@
                 <!-- Designate how the collection of items are laid out -->
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical"
-                            ItemSpacing="10"/>
+                                       ItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
 
                 <!-- Define the appearance of each item in the list -->

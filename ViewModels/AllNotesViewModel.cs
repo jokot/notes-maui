@@ -27,10 +27,7 @@ public partial class AllNotesViewModel : BaseViewModel
             IsBusy = true;
 
             var notes = await noteService.GetNotes();
-
-            if (Notes.Count > 0)
-                Notes.Clear();
-
+            Notes.Clear();
             foreach (var note in notes)
                 Notes.Add(note);
         }
@@ -50,7 +47,24 @@ public partial class AllNotesViewModel : BaseViewModel
     async Task RefreshNotes()
     {
         IsRefreshing = true;
-        await GetNotesAsync();
+        try
+        {
+            IsBusy = true;
+            var notes = await noteService.ForceRefreshNotes();
+            Notes.Clear();
+            foreach (var note in notes)
+                Notes.Add(note);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Unable to get notes: {ex.Message}");
+            await Shell.Current.DisplayAlert("Error!", ex.Message, "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+            IsRefreshing = false;
+        }
     }
 
     [RelayCommand]

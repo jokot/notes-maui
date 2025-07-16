@@ -2,21 +2,9 @@ using Notes.Services;
 
 namespace Notes.ViewModels;
 
-// [QueryProperty(nameof(ItemId), nameof(ItemId))]
-[QueryProperty(nameof(Note), nameof(Note))] // Assuming Note is a property of type Note
+[QueryProperty(nameof(Note), nameof(Note))]
 public partial class NoteViewModel : BaseViewModel
 {
-
-    // private string _itemId;
-    // public string ItemId
-    // {
-    // 	get => _itemId;
-    // 	set
-    // 	{
-    // 		_itemId = value;
-    // 		LoadNote(_itemId);
-    // 	}
-    // }
 
     readonly NoteService noteService;
 
@@ -24,15 +12,7 @@ public partial class NoteViewModel : BaseViewModel
     {
         Title = "Note";
         this.noteService = noteService;
-
-        string appDataPath = FileSystem.AppDataDirectory;
-        string randomFileName = $"{Path.GetRandomFileName()}.notes.txt";
-        note = new Note
-        {
-            Filename = Path.Combine(appDataPath, randomFileName),
-            Text = string.Empty,
-            Date = DateTime.Now
-        };
+        note = new Note();
     }
 
     [ObservableProperty]
@@ -41,14 +21,14 @@ public partial class NoteViewModel : BaseViewModel
     [RelayCommand]
     async Task SaveNote()
     {
-        noteService.SaveNote(Note!.Filename, Note.Text);
+        await noteService.SaveNote(Note!.Filename, Note.Text);
         await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
     async Task DeleteNote()
     {
-        noteService.DeleteNote(Note!.Filename);
+        await noteService.DeleteNote(Note!.Filename);
         await Shell.Current.GoToAsync("..");
     }
 }

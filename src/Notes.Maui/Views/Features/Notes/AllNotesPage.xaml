@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                 xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
+    xmlns:models="clr-namespace:Notes.Core.Models;assembly=Notes.Core"
+    x:Class="Notes.Maui.Views.Features.Notes.AllNotesPage"
+    Title="{Binding Title}"
+    x:DataType="viewmodels:AllNotesViewModel">
+    <!-- Add an item to the toolbar -->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add"
+                     Command="{Binding AddNoteCommand}"
+                     IconImageSource="{FontImage Glyph='+', Color=Black, Size=22}"/>
+    </ContentPage.ToolbarItems>
+    <RefreshView
+        Command="{Binding RefreshNotesCommand}"
+        IsRefreshing="{Binding IsRefreshing}">
+        <Grid>
+            <!-- Display notes in a list -->
+            <CollectionView
+                x:Name="notesCollection"
+                ItemsSource="{Binding Notes}"
+                Margin="20"
+                SelectionMode="None">
+
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="20">
+                        <Label Text="No notes available"
+                               FontSize="20"
+                               HorizontalOptions="Center"/>
+                        <Button Text="Add Note"
+                                Command="{Binding AddNoteCommand}"
+                                HorizontalOptions="Center"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+
+                <!-- Designate how the collection of items are laid out -->
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"
+                                       ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <!-- Define the appearance of each item in the list -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Note">
+                        <StackLayout>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </StackLayout.GestureRecognizers>
+
+                            <Label Text="{Binding Text}"
+                                   FontSize="22"/>
+                            <Label Text="{Binding Date}"
+                                   FontSize="14"
+                                   TextColor="Silver"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator
+                IsVisible="{Binding IsBusy}"
+                IsRunning="{Binding IsBusy}"
+                Color="{StaticResource Primary}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+        </Grid>
+    </RefreshView>
+</ContentPage>

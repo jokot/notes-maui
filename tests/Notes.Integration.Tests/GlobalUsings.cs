@@ -1,0 +1,11 @@
+global using Xunit;
+global using Moq;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.DependencyInjection;
+global using Notes.Core.Commands;
+global using Notes.Core.Constants;
+global using Notes.Core.Handlers;
+global using Notes.Core.Interfaces;
+global using Notes.Core.Models;
+global using Notes.Core.Services.Data;
+global using Notes.Core.Services.Repository; 

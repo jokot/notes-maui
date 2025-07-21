@@ -1,3 +1,3 @@
 namespace Notes.Core.Commands;
-
-public record DeleteNoteCommand(string FileName = ""); 
+ 
+public record DeleteNoteCommand(Note Note); 

@@ -19,24 +19,27 @@ public class SaveNoteHandlerTests
     public async Task HandleAsync_NewNote_CallsAddAsync()
     {
         // Arrange
-        var command = new SaveNoteCommand("Test Title", "Test Content");
+        var note = new Note { Text = "Test Content" }; // No filename = new note
+        var command = new SaveNoteCommand(note);
         var expectedNote = new Note
         {
-            Filename = "expected-filename.notes.txt",
-            Text = command.Text,
-            Date = command.Date
+            Id = "123",
+            Filename = "test-file.notes.txt",
+            Text = note.Text,
+            UpdatedAt = note.UpdatedAt
         };
 
-        _mockFileDataService.Setup(x => x.NoteExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
+        _mockFileDataService.Setup(x => x.GenerateFilename()).Returns("generated-filename.notes.txt");
         _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ReturnsAsync(expectedNote);
 
         // Act
         var result = await _handler.HandleAsync(command);
 
         // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Test Content", result.Text);
         _mockRepository.Verify(x => x.AddAsync(It.IsAny<Note>()), Times.Once);
         _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>()), Times.Never);
-        Assert.NotNull(result);
     }
 
     [Fact]
@@ -44,12 +47,19 @@ public class SaveNoteHandlerTests
     {
         // Arrange
         var existingFileName = "existing-file.notes.txt";
-        var command = new SaveNoteCommand("Test Title", "Test Content", existingFileName);
-        var expectedNote = new Note
+        var note = new Note
         {
             Filename = existingFileName,
-            Text = command.Text,
-            Date = command.Date
+            Text = "Updated content"
+        };
+        var command = new SaveNoteCommand(note);
+
+        var expectedNote = new Note
+        {
+            Id = "456",
+            Filename = existingFileName,
+            Text = note.Text,
+            UpdatedAt = note.UpdatedAt
         };
 
         _mockFileDataService.Setup(x => x.NoteExistsAsync(existingFileName)).ReturnsAsync(true);
@@ -69,10 +79,11 @@ public class SaveNoteHandlerTests
     public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
     {
         // Arrange
-        var command = new SaveNoteCommand("Test Title", "Test Content");
+        var note = new Note { Text = "Test Content" };
+        var command = new SaveNoteCommand(note);
         var exception = new Exception("Repository error");
 
-        _mockFileDataService.Setup(x => x.NoteExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
+        _mockFileDataService.Setup(x => x.GenerateFilename()).Returns("test-filename.notes.txt");
         _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ThrowsAsync(exception);
 
         // Act & Assert

@@ -29,11 +29,8 @@ public partial class NoteViewModel : BaseViewModel
         {
             if (Note != null && !string.IsNullOrWhiteSpace(Note.Text))
             {
-                // Create command with note data
-                var command = new SaveNoteCommand(
-                    title: ExtractTitle(Note.Text), 
-                    text: Note.Text, 
-                    fileName: Note.Filename);
+                // Create command with the note object
+                var command = new SaveNoteCommand(Note);
 
                 // Use handler to process the command
                 var savedNote = await _saveNoteHandler.HandleAsync(command);
@@ -45,25 +42,15 @@ public partial class NoteViewModel : BaseViewModel
         }, nameof(SaveNote));
     }
 
-    private static string ExtractTitle(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return "Untitled";
-            
-        // Take first line or first 50 characters as title
-        var firstLine = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
-        return firstLine.Length > 50 ? firstLine[..50] + "..." : firstLine;
-    }
-
     [RelayCommand]
     async Task DeleteNote()
     {
         await ExecuteAsync(async () =>
         {
-            if (Note != null && !string.IsNullOrEmpty(Note.Filename))
+            if (Note != null)
             {
-                // Create command with filename to delete
-                var command = new DeleteNoteCommand(Note.Filename);
+                // Create command with the full Note object
+                var command = new DeleteNoteCommand(Note);
 
                 // Use handler to process the command
                 var success = await _deleteNoteHandler.HandleAsync(command);

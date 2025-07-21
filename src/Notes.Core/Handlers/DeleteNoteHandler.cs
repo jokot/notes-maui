@@ -17,29 +17,18 @@ public class DeleteNoteHandler
     {
         try
         {
-            if (string.IsNullOrEmpty(command.FileName))
+            if (command.Note == null)
             {
-                _logger.LogWarning("Delete command received with empty filename");
+                _logger.LogWarning("Delete command received with null note");
                 return false;
             }
 
-            // Find the note by filename to get its ID
-            var allNotes = await _noteRepository.GetAllAsync();
-            var noteToDelete = allNotes.FirstOrDefault(n => n.Filename == command.FileName);
-
-            if (noteToDelete == null)
-            {
-                _logger.LogWarning("Note not found for deletion: {FileName}", command.FileName);
-                return false;
-            }
-
-            await _noteRepository.DeleteAsync(noteToDelete.Id);
-            _logger.LogInformation("Note deleted: {FileName}", command.FileName);
+            await _noteRepository.DeleteAsync(command.Note.Id);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to delete note: {FileName}", command.FileName);
+            _logger.LogError(ex, "Failed to delete note: {FileName}", command.Note?.Filename ?? "unknown");
             throw;
         }
     }

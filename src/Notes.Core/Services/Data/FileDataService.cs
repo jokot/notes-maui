@@ -3,10 +3,15 @@ namespace Notes.Core.Services.Data;
 public class FileDataService : IFileDataService
 {
     private readonly ILogger<FileDataService> _logger;
+    private readonly string _dataPath;
 
-    public FileDataService(ILogger<FileDataService> logger)
+    public FileDataService(ILogger<FileDataService> logger, string? dataPath = null)
     {
         _logger = logger;
+        _dataPath = dataPath ?? Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        
+        // Ensure the directory exists
+        Directory.CreateDirectory(_dataPath);
     }
 
     public async Task<List<Note>> LoadNotesAsync()
@@ -14,22 +19,51 @@ public class FileDataService : IFileDataService
         try
         {
             var notes = new List<Note>();
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var files = Directory.EnumerateFiles(appDataPath, "*.notes.txt");
+            var files = Directory.EnumerateFiles(_dataPath, "*.notes.txt");
 
             foreach (var file in files)
             {
                 try
                 {
-                    string text = await File.ReadAllTextAsync(file);
-                    DateTime date = File.GetLastWriteTime(file);
-
-                    notes.Add(new Note
+                    string content = await File.ReadAllTextAsync(file);
+                    DateTime fileTime = File.GetLastWriteTime(file);
+                    
+                    Note note;
+                    
+                    // Try to deserialize as minimal JSON first
+                    try
                     {
-                        Filename = file,
-                        Text = text,
-                        Date = date
-                    });
+                        var jsonData = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+                        if (jsonData != null && jsonData.ContainsKey("id") && jsonData.ContainsKey("text"))
+                        {
+                            // Parse minimal JSON format
+                            note = new Note
+                            {
+                                Id = jsonData["id"].ToString() ?? Guid.NewGuid().ToString(),
+                                Filename = file,
+                                Text = jsonData["text"].ToString() ?? "",
+                                UpdatedAt = jsonData.ContainsKey("updatedAt") && DateTime.TryParse(jsonData["updatedAt"].ToString(), out var parsedDate) 
+                                    ? parsedDate 
+                                    : fileTime
+                            };
+                        }
+                        else
+                        {
+                            throw new JsonException("Invalid JSON format");
+                        }
+                    }
+                    catch
+                    {
+                        // Fall back to plain text format
+                        note = new Note
+                        {
+                            Filename = file,
+                            Text = content,
+                            UpdatedAt = fileTime
+                        };
+                    }
+
+                    notes.Add(note);
                 }
                 catch (Exception ex)
                 {
@@ -37,7 +71,7 @@ public class FileDataService : IFileDataService
                 }
             }
 
-            return [.. notes.OrderByDescending(note => note.Date)];
+            return [.. notes.OrderByDescending(note => note.UpdatedAt)];
         }
         catch (Exception ex)
         {
@@ -46,15 +80,25 @@ public class FileDataService : IFileDataService
         }
     }
 
-    public async Task SaveNoteAsync(string filename, string text)
+    public async Task SaveNoteAsync(Note note)
     {
         try
         {
-            await File.WriteAllTextAsync(filename, text);
+            // Create minimal JSON with only essential properties
+            var minimalData = new
+            {
+                id = note.Id,
+                text = note.Text,
+                updatedAt = note.UpdatedAt.ToString("O") // ISO 8601 format
+            };
+            
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonContent = JsonSerializer.Serialize(minimalData, options);
+            await File.WriteAllTextAsync(note.Filename, jsonContent);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving note to file: {Filename}", filename);
+            _logger.LogError(ex, "Error saving note to file: {Filename}", note.Filename);
             throw;
         }
     }
@@ -81,41 +125,9 @@ public class FileDataService : IFileDataService
         return File.Exists(filename);
     }
 
-    public string GenerateUniqueFilename()
+    public string GenerateFilename()
     {
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        
-        // Ensure the directory exists
-        Directory.CreateDirectory(appDataPath);
-        
-        // Get random filename and strip any path separators
-        string randomName = Path.GetRandomFileName().Replace(".", "").Replace(Path.DirectorySeparatorChar.ToString(), "");
-        string randomFileName = $"{randomName}.notes.txt";
-        return Path.Combine(appDataPath, randomFileName);
-    }
-
-    public string GenerateFilename(string title)
-    {
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        
-        // Ensure the directory exists
-        Directory.CreateDirectory(appDataPath);
-        
-        string safeTitle = GetSafeFilename(title);
-        string filename = $"{safeTitle}.{DateTime.Now:yyyyMMddHHmmss}.notes.txt";
-        return Path.Combine(appDataPath, filename);
-    }
-
-    private static string GetSafeFilename(string title)
-    {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            return "untitled";
-        }
-
-        // Remove invalid characters and limit length
-        var invalidChars = Path.GetInvalidFileNameChars();
-        var safeName = new string(title.Where(c => !invalidChars.Contains(c)).ToArray());
-        return string.IsNullOrWhiteSpace(safeName) ? "untitled" : safeName.Substring(0, Math.Min(safeName.Length, 50));
+        string filename = $"{DateTime.Now:yyyyMMdd-HHmmss}.notes.txt";
+        return Path.Combine(_dataPath, filename);
     }
 }

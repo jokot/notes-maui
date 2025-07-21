@@ -3,38 +3,56 @@ namespace Notes.Core.Tests.Commands;
 public class DeleteNoteCommandTests
 {
     [Fact]
-    public void Constructor_WithFileName_SetsFileNameCorrectly()
+    public void Constructor_WithNote_SetsNoteCorrectly()
     {
         // Arrange
-        var fileName = "test-file.notes.txt";
+        var note = new Note 
+        { 
+            Id = "123", 
+            Filename = "test-file.notes.txt", 
+            Text = "Test content",
+            UpdatedAt = DateTime.Now
+        };
 
         // Act
-        var command = new DeleteNoteCommand(fileName);
+        var command = new DeleteNoteCommand(note);
 
         // Assert
-        Assert.Equal(fileName, command.FileName);
+        Assert.Equal(note, command.Note);
+        Assert.Equal("test-file.notes.txt", command.Note.Filename);
+        Assert.Equal("123", command.Note.Id);
+        Assert.Equal("Test content", command.Note.Text);
     }
 
     [Fact]
-    public void DefaultConstructor_SetsDefaultValues()
+    public void Constructor_WithNullNote_SetsNoteToNull()
     {
         // Act
-        var command = new DeleteNoteCommand();
+        var command = new DeleteNoteCommand(null!);
 
         // Assert
-        Assert.Equal(string.Empty, command.FileName);
+        Assert.Null(command.Note);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    public void Constructor_WithInvalidFileName_SetsFileName(string? fileName)
+    [Fact]
+    public void Constructor_WithValidNote_AllPropertiesAccessible()
     {
+        // Arrange
+        var note = new Note 
+        { 
+            Id = "456", 
+            Filename = "another-test.notes.txt", 
+            Text = "Another test content",
+            UpdatedAt = DateTime.Now
+        };
+
         // Act
-        var command = new DeleteNoteCommand(fileName);
+        var command = new DeleteNoteCommand(note);
 
         // Assert
-        Assert.Equal(fileName, command.FileName);
+        Assert.NotNull(command.Note);
+        Assert.Equal("456", command.Note.Id);
+        Assert.Equal("another-test.notes.txt", command.Note.Filename);
+        Assert.Equal("Another test content", command.Note.Text);
     }
 } 

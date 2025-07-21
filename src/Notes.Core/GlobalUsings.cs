@@ -9,4 +9,4 @@ global using Notes.Core.Handlers;
 global using Notes.Core.Interfaces;
 global using Notes.Core.Models;
 global using Notes.Core.Services.Data;
-global using Notes.Core.Services.Repository; 
+global using Notes.Core.Services.Repository;

@@ -20,45 +20,30 @@ public class SaveNoteHandler
     {
         try
         {
-            var filename = GenerateFilename(command);
-            
-            var note = new Note
-            {
-                Filename = filename,
-                Text = command.Text,
-                Date = command.Date
-            };
+            var note = command.Note;
 
-            // Check if this is an update (filename provided) or new note
-            if (!string.IsNullOrEmpty(command.FileName) && await _fileDataService.NoteExistsAsync(command.FileName))
+            if (!string.IsNullOrEmpty(note.Filename) && await _fileDataService.NoteExistsAsync(note.Filename))
             {
-                note.Filename = command.FileName;
                 var result = await _noteRepository.UpdateAsync(note);
-                _logger.LogInformation("Note updated: {Filename}", note.Filename);
                 return result;
             }
             else
             {
+                if (string.IsNullOrEmpty(note.Filename))
+                {
+                    note.Filename = _fileDataService.GenerateFilename();
+                }
+                
                 var result = await _noteRepository.AddAsync(note);
-                _logger.LogInformation("Note created: {Filename}", note.Filename);
                 return result;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to save note: {Title}", command.Title);
+            _logger.LogError(ex, "Failed to save note: {Text}", command.Note.Text[..Math.Min(50, command.Note.Text.Length)]);
             throw;
         }
     }
 
-    private string GenerateFilename(SaveNoteCommand command)
-    {
-        if (!string.IsNullOrEmpty(command.FileName))
-        {
-            return command.FileName;
-        }
 
-        // Use the file data service for filename generation
-        return _fileDataService.GenerateFilename(command.Title);
-    }
 } 

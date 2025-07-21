@@ -3,53 +3,56 @@ namespace Notes.Core.Tests.Commands;
 public class SaveNoteCommandTests
 {
     [Fact]
-    public void Constructor_WithParameters_SetsPropertiesCorrectly()
+    public void Constructor_WithNote_SetsNoteCorrectly()
     {
         // Arrange
-        var title = "Test Title";
-        var text = "Test Content";
-        var fileName = "test-file.txt";
+        var note = new Note 
+        { 
+            Id = "123", 
+            Filename = "test-file.notes.txt", 
+            Text = "Test content",
+            UpdatedAt = DateTime.Now
+        };
 
         // Act
-        var command = new SaveNoteCommand(title, text, fileName);
+        var command = new SaveNoteCommand(note);
 
         // Assert
-        Assert.Equal(title, command.Title);
-        Assert.Equal(text, command.Text);
-        Assert.Equal(fileName, command.FileName);
-        Assert.True(command.Date <= DateTime.Now);
-        Assert.True(command.Date >= DateTime.Now.AddSeconds(-1));
+        Assert.Equal(note, command.Note);
+        Assert.Equal("test-file.notes.txt", command.Note.Filename);
+        Assert.Equal("123", command.Note.Id);
+        Assert.Equal("Test content", command.Note.Text);
     }
 
     [Fact]
-    public void Constructor_WithoutFileName_SetsPropertiesCorrectly()
+    public void Constructor_WithNullNote_SetsNoteToNull()
     {
-        // Arrange
-        var title = "Test Title";
-        var text = "Test Content";
-
         // Act
-        var command = new SaveNoteCommand(title, text);
+        var command = new SaveNoteCommand(null!);
 
         // Assert
-        Assert.Equal(title, command.Title);
-        Assert.Equal(text, command.Text);
-        Assert.Null(command.FileName);
-        Assert.True(command.Date <= DateTime.Now);
-        Assert.True(command.Date >= DateTime.Now.AddSeconds(-1));
+        Assert.Null(command.Note);
     }
 
     [Fact]
-    public void DefaultConstructor_SetsDefaultValues()
+    public void Constructor_WithValidNote_AllPropertiesAccessible()
     {
+        // Arrange
+        var note = new Note 
+        { 
+            Id = "456", 
+            Filename = "another-test.notes.txt", 
+            Text = "Another test content",
+            UpdatedAt = DateTime.Now
+        };
+
         // Act
-        var command = new SaveNoteCommand();
+        var command = new SaveNoteCommand(note);
 
         // Assert
-        Assert.Equal(string.Empty, command.Title);
-        Assert.Equal(string.Empty, command.Text);
-        Assert.Null(command.FileName);
-        Assert.True(command.Date <= DateTime.Now);
-        Assert.True(command.Date >= DateTime.Now.AddSeconds(-1));
+        Assert.NotNull(command.Note);
+        Assert.Equal("456", command.Note.Id);
+        Assert.Equal("another-test.notes.txt", command.Note.Filename);
+        Assert.Equal("Another test content", command.Note.Text);
     }
 } 

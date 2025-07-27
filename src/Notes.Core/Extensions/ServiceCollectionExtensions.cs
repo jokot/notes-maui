@@ -2,10 +2,14 @@ namespace Notes.Core.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddCoreServices(this IServiceCollection services)
+    public static IServiceCollection AddCoreServices(this IServiceCollection services, string? dataPath = null)
     {
-        // Core Services
-        services.AddSingleton<IFileDataService, FileDataService>();
+        // Core Services - Configure FileDataService with provided data path
+        services.AddSingleton<IFileDataService>(serviceProvider =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<FileDataService>>();
+            return new FileDataService(logger, dataPath);
+        });
 
         // Repositories
         services.AddSingleton<IRepository<Note>, NoteRepository>();

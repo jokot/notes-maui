@@ -5,21 +5,25 @@
                  xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
     xmlns:models="clr-namespace:Notes.Core.Models;assembly=Notes.Core"
     x:Class="Notes.Maui.Views.Features.Notes.AllNotesPage"
+    AutomationId="PageTitle"
     Title="{Binding Title}"
     x:DataType="viewmodels:AllNotesViewModel">
     <!-- Add an item to the toolbar -->
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Add"
+                     AutomationId="AddNoteButton"
                      Command="{Binding AddNoteCommand}"
                      IconImageSource="{FontImage Glyph='+', Color=Black, Size=22}"/>
     </ContentPage.ToolbarItems>
     <RefreshView
+        AutomationId="RefreshButton"
         Command="{Binding RefreshNotesCommand}"
         IsRefreshing="{Binding IsRefreshing}">
         <Grid>
             <!-- Display notes in a list -->
             <CollectionView
                 x:Name="notesCollection"
+                AutomationId="NotesCollection"
                 ItemsSource="{Binding Notes}"
                 Margin="20"
                 SelectionMode="None">
@@ -32,6 +36,7 @@
                                FontSize="20"
                                HorizontalOptions="Center"/>
                         <Button Text="Add Note"
+                                AutomationId="EmptyStateAddButton"
                                 Command="{Binding AddNoteCommand}"
                                 HorizontalOptions="Center"/>
                     </StackLayout>
@@ -46,7 +51,7 @@
                 <!-- Define the appearance of each item in the list -->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Note">
-                        <StackLayout>
+                        <StackLayout AutomationId="NoteItem">
                             <StackLayout.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
@@ -54,8 +59,10 @@
                             </StackLayout.GestureRecognizers>
 
                             <Label Text="{Binding Text}"
+                                   AutomationId="NoteText"
                                    FontSize="22"/>
                             <Label Text="{Binding UpdatedAt}"
+                                   AutomationId="NoteDate"
                                    FontSize="14"
                                    TextColor="Silver"/>
                         </StackLayout>

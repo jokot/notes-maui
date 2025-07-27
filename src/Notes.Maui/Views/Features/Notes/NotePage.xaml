@@ -3,20 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
              x:Class="Notes.Maui.Views.Features.Notes.NotePage"
+             AutomationId="PageTitle"
              Title="{Binding Title}"
              x:DataType="viewmodels:NoteViewModel">
     <VerticalStackLayout Spacing="10" Margin="5">
         <Editor x:Name="TextEditor"
+                AutomationId="NoteEditor"
                 Placeholder="Enter your note"
                 Text="{Binding Note.Text}"
                 HeightRequest="100" />
 
         <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
             <Button Text="Save"
+                    AutomationId="SaveButton"
                     Command="{Binding SaveNoteCommand}" />
 
             <Button Grid.Column="1"
                     Text="Delete"
+                    AutomationId="DeleteButton"
                     Command="{Binding DeleteNoteCommand}" />
         </Grid>
     </VerticalStackLayout>

@@ -11,19 +11,29 @@ This project serves as a learning foundation for building enterprise-grade mobil
 ```
 Notes/
 ├── src/                           # Main application source code
-│   ├── Core/                      # Business logic and architecture
+│   ├── Notes.Core/                # Business logic and core functionality
+│   │   ├── Commands/              # CQRS command definitions
+│   │   ├── Constants/             # Application constants
+│   │   ├── Extensions/            # Service collection extensions
+│   │   ├── Handlers/              # Command handlers
 │   │   ├── Interfaces/            # Contracts and abstractions
-│   │   ├── Models/                # Data models
-│   │   ├── Services/              # Business services
-│   │   └── ViewModels/            # MVVM ViewModels
-│   ├── Views/                     # XAML pages and UI
-│   ├── Platforms/                 # Platform-specific code
-│   ├── Resources/                 # Images, fonts, styles
-│   └── Shared/                    # Shared utilities and constants
-├── tests/                         # Unit tests project
-│   ├── ViewModels/                # ViewModel tests
-│   └── (Test infrastructure)      # Test setup and utilities
-├── README.md                      # Project documentation
+│   │   ├── Models/                # Data models and entities
+│   │   └── Services/              # Business services and data access
+│   └── Notes.Maui/                # MAUI application (UI layer)
+│       ├── App.xaml               # Application entry point
+│       ├── AppShell.xaml          # Shell navigation structure
+│       ├── Platforms/             # Platform-specific implementations
+│       ├── Resources/             # Images, fonts, styles
+│       ├── Services/              # UI-specific services
+│       ├── ViewModels/            # MVVM ViewModels
+│       └── Views/                 # XAML pages and UI components
+├── tests/                         # Comprehensive testing suite
+│   ├── Notes.Core.Tests/          # Unit tests for business logic
+│   ├── Notes.Integration.Tests/   # Integration tests for services
+│   ├── Notes.UI.Tests/            # UI automation tests with Appium
+│   └── README.md                  # Testing documentation
+├── .vscode/                       # VS Code configuration
+├── README.md                      # This file
 ├── LICENSE                        # MIT license
 └── Notes.sln                      # Solution file
 ```
@@ -36,6 +46,8 @@ Notes/
 - **Force Refresh**: Manual cache bypass option for guaranteed fresh data
 
 ### Modern Architecture
+- **Clean Architecture**: Separation of concerns with Notes.Core and Notes.Maui projects
+- **CQRS Pattern**: Command Query Responsibility Segregation for better organization
 - **MVVM Pattern**: Clean separation of concerns with CommunityToolkit.Mvvm
 - **Dependency Injection**: Microsoft.Extensions.DependencyInjection for loose coupling
 - **Shell Navigation**: Efficient page navigation with parameter passing
@@ -53,9 +65,12 @@ Notes/
 - **.NET MAUI**: Cross-platform UI framework
 - **CommunityToolkit.Mvvm**: MVVM framework with source generators
 - **System.Text.Json**: High-performance JSON serialization
-- **Xunit**: Unit testing framework
+- **Clean Architecture**: Separation of business logic and UI concerns
+- **CQRS Pattern**: Command handlers for business operations
+- **xUnit**: Unit testing framework with comprehensive test coverage
 - **FluentAssertions**: Expressive test assertions
 - **Moq**: Mocking framework for unit tests
+- **Appium**: UI automation testing for cross-platform scenarios
 
 ## 🚀 Getting Started
 
@@ -87,13 +102,13 @@ Notes/
 4. **Run on specific platform**
    ```bash
    # Android
-   dotnet build src/Notes.csproj -t:Run -f net9.0-android
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-android
    
    # iOS Simulator
-   dotnet build src/Notes.csproj -t:Run -f net9.0-ios
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-ios
    
    # macOS
-   dotnet build src/Notes.csproj -t:Run -f net9.0-maccatalyst
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-maccatalyst
    ```
 
 ### Running Tests
@@ -102,8 +117,19 @@ Notes/
 # Run all tests
 dotnet test
 
+# Run specific test categories
+dotnet test --filter Category=Unit          # Unit tests only
+dotnet test --filter Category=Integration   # Integration tests only
+dotnet test --filter Category=UI            # UI automation tests only
+
+# Run by speed
+dotnet test --filter Category=Fast          # Quick tests
+dotnet test --filter Category=Slow          # Longer-running tests
+
 # Run specific test project
-dotnet test tests/Notes.Tests.csproj
+dotnet test tests/Notes.Core.Tests
+dotnet test tests/Notes.Integration.Tests
+dotnet test tests/Notes.UI.Tests
 
 # Run with detailed output
 dotnet test --verbosity normal
@@ -116,6 +142,20 @@ dotnet test --verbosity normal
 - **Read**: List all notes with smart caching
 - **Update**: Edit existing note content
 - **Delete**: Remove notes with immediate cache cleanup
+
+### Clean Architecture Implementation
+```csharp
+// Command pattern with handlers
+public class SaveNoteCommand
+{
+    public Note Note { get; set; }
+}
+
+public class SaveNoteHandler : IRequestHandler<SaveNoteCommand>
+{
+    // Business logic separated from UI concerns
+}
+```
 
 ### Smart Caching Logic
 ```csharp
@@ -138,28 +178,46 @@ public async Task SaveNoteAsync(Note note)
 
 ## 🧪 Testing Strategy
 
-The project includes a comprehensive testing framework setup:
+The project includes a comprehensive three-layer testing framework:
 
-### Test Structure
-- **Unit Tests**: Business logic validation
-- **ViewModel Tests**: MVVM behavior verification
-- **Service Tests**: Data layer functionality
-- **Mock Integration**: Isolated component testing
+### Test Architecture
+- **Notes.Core.Tests**: Unit tests for business logic (23 tests)
+  - Commands, Handlers, Models validation
+  - Fast execution (< 30 seconds)
+  - Categories: `Unit`, `Fast`, `Commands`, `Handlers`
 
-### Current Testing Notes
-- Test project targets `net9.0` for compatibility
-- MAUI-specific testing requires special consideration
-- Future enhancement: Extract business logic to separate libraries for easier testing
+- **Notes.Integration.Tests**: Service integration tests (9 tests)
+  - Cross-service interactions and data flow
+  - Moderate execution (1-3 minutes)
+  - Categories: `Integration`, `Slow`, `Services`, `Data`
+
+- **Notes.UI.Tests**: End-to-end UI automation (17 tests)
+  - Complete user workflows with Appium
+  - Estimated execution (~5-7 minutes)
+  - Categories: `UI`, `Smoke`, `Regression`, `Diagnostic`
+
+### Test Organization
+- **Trait-based categorization**: Multiple categories per test for flexible filtering
+- **Speed-based filtering**: Fast/Slow categories for CI/CD optimization
+- **Component-specific filtering**: Target specific areas of the application
+- **Comprehensive coverage**: From unit tests to full UI automation
+
+### Testing Best Practices
+- Clean test architecture with base classes
+- Proper test isolation and cleanup
+- Mock-based unit testing for fast feedback
+- Real integration testing for confidence
 
 ## 🎯 Learning Objectives
 
-This project addresses key concepts for enterprise mobile development:
+This project demonstrates key concepts for enterprise mobile development:
 
-1. **Architecture Patterns**: MVVM, Dependency Injection, Repository Pattern
-2. **Performance Optimization**: Smart caching, async programming, memory management
-3. **Cross-Platform Development**: Platform abstractions, responsive design
-4. **Testing Practices**: Unit testing, mocking, test-driven development
-5. **Data Management**: File I/O, JSON serialization, data persistence
+1. **Clean Architecture**: Clear separation between business logic (Notes.Core) and UI (Notes.Maui)
+2. **CQRS Pattern**: Command handlers for organized business operations
+3. **Testing Strategies**: Comprehensive test pyramid from unit to UI automation
+4. **Cross-Platform Development**: Platform abstractions and responsive design
+5. **Performance Optimization**: Smart caching, async programming, memory management
+6. **Modern .NET Patterns**: Dependency injection, MVVM, and latest C# features
 
 ## 🔄 Smart Cache Implementation
 
@@ -193,17 +251,17 @@ The `NoteService` implements intelligent caching to optimize performance:
 ## 🔮 Future Enhancements
 
 ### Planned Features
-1. **Enterprise Architecture**: Clean Architecture implementation
-2. **Advanced Testing**: Integration and UI tests
+1. **Enhanced Testing**: Expanded UI automation and performance testing
+2. **Advanced Caching**: Distributed caching and sync mechanisms
 3. **Offline Sync**: Cloud synchronization with conflict resolution
-4. **Security**: Encryption and authentication
-5. **POS Integration**: Payment processing and inventory management
+4. **Security**: Encryption and authentication layers
+5. **POS Integration**: Payment processing and inventory management features
 
 ### Technical Improvements
-- **Separate Class Libraries**: Extract business logic for better testing
-- **CQRS Pattern**: Command Query Responsibility Segregation
 - **Event Sourcing**: Audit trail and data history
 - **Microservices**: Distributed architecture preparation
+- **Advanced CQRS**: Event-driven architecture patterns
+- **Performance Monitoring**: Application insights and telemetry
 
 ## 🤝 Contributing
 

@@ -13,8 +13,8 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// Register Core Services
-		builder.Services.AddCoreServices();
+		// Register Core Services with platform-specific data directory
+		builder.Services.AddCoreServices(FileSystem.AppDataDirectory);
 		
 		// Register MAUI-specific Services
 		builder.Services.AddSingleton<INavigationService, NavigationService>();

@@ -3,6 +3,9 @@ namespace Notes.Core.Tests.Commands;
 public class GetAllNotesCommandTests
 {
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Commands")]
     public void Constructor_CreatesInstanceSuccessfully()
     {
         // Act
@@ -13,6 +16,9 @@ public class GetAllNotesCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Commands")]
     public void Command_IsInstantiable()
     {
         // This test ensures the command class can be created

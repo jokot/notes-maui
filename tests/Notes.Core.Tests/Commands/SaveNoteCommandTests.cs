@@ -3,6 +3,9 @@ namespace Notes.Core.Tests.Commands;
 public class SaveNoteCommandTests
 {
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Commands")]
     public void Constructor_WithNote_SetsNoteCorrectly()
     {
         // Arrange
@@ -25,6 +28,9 @@ public class SaveNoteCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Commands")]
     public void Constructor_WithNullNote_SetsNoteToNull()
     {
         // Act
@@ -35,6 +41,9 @@ public class SaveNoteCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Commands")]
     public void Constructor_WithValidNote_AllPropertiesAccessible()
     {
         // Arrange

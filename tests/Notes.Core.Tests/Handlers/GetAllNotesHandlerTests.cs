@@ -14,6 +14,9 @@ public class GetAllNotesHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_ReturnsNotesFromRepository()
     {
         // Arrange
@@ -36,6 +39,9 @@ public class GetAllNotesHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_EmptyRepository_ReturnsEmptyCollection()
     {
         // Arrange
@@ -53,6 +59,9 @@ public class GetAllNotesHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
     {
         // Arrange

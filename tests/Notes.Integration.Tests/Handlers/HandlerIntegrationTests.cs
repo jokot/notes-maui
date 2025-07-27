@@ -27,6 +27,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task SaveNoteHandler_WithRepository_IntegratesCorrectly()
     {
         // Arrange
@@ -45,6 +48,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task DeleteNoteHandler_WithValidNote_IntegratesCorrectly()
     {
         // Arrange
@@ -71,6 +77,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task DeleteNoteHandler_IsolatedTest_WorksCorrectly()
     {
         // Arrange
@@ -102,6 +111,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task GetAllNotesHandler_WithMultipleNotes_ReturnsAllNotes()
     {
         // Arrange
@@ -125,6 +137,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task CommandHandlerPipeline_FullWorkflow_IntegratesCorrectly()
     {
         // Arrange - Create isolated service provider for consistent state
@@ -167,6 +182,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task DebugSaveAndLoad_TraceProblem()
     {
         // Arrange
@@ -201,6 +219,9 @@ public class HandlerIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Handlers")]
     public async Task DebugDeleteOperation_TraceProblem()
     {
         // Arrange

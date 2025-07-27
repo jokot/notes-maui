@@ -27,6 +27,9 @@ public class NoteServiceIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Services")]
     public async Task SaveAndRetrieveNote_Integration_WorksCorrectly()
     {
         // Arrange
@@ -46,6 +49,9 @@ public class NoteServiceIntegrationTests : IDisposable
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Slow")]
+    [Trait("Category", "Services")]
     public async Task SaveUpdateDeleteNote_FullWorkflow_WorksCorrectly()
     {
         // Arrange

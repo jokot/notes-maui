@@ -14,6 +14,9 @@ public class DeleteNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_ValidNote_DeletesNoteAndReturnsTrue()
     {
         // Arrange
@@ -29,6 +32,9 @@ public class DeleteNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_NullNote_ReturnsFalse()
     {
         // Arrange
@@ -43,6 +49,9 @@ public class DeleteNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
     {
         // Arrange
@@ -57,6 +66,9 @@ public class DeleteNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_ValidNote_LogsInformation()
     {
         // Arrange

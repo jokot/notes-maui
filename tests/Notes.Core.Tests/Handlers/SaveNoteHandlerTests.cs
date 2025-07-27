@@ -16,6 +16,9 @@ public class SaveNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_NewNote_CallsAddAsync()
     {
         // Arrange
@@ -43,6 +46,9 @@ public class SaveNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_ExistingNote_CallsUpdateAsync()
     {
         // Arrange
@@ -76,6 +82,9 @@ public class SaveNoteHandlerTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "Fast")]
+    [Trait("Category", "Handlers")]
     public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
     {
         // Arrange

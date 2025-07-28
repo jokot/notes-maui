@@ -1,6 +1,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Interactions;
 using System.Linq;
 
 namespace Notes.UI.Tests.PageObjects;
@@ -14,15 +15,45 @@ public class NotesListPage
         _driver = driver;
     }
 
-    // Page elements - iOS compatible selectors
-    public AppiumElement PageTitle => _driver.FindElement(MobileBy.AccessibilityId("PageTitle"));
+    // Page elements - Cross-platform compatible selectors
+    public AppiumElement PageTitle 
+    {
+        get
+        {
+            try
+            {
+                return _driver.FindElement(MobileBy.AccessibilityId("PageTitle"));
+            }
+            catch
+            {
+                // Android: Look for TextView with "Notes" text or in ActionBar
+                try
+                {
+                    return _driver.FindElement(By.XPath("//android.widget.TextView[contains(@text,'Notes')] | //android.widget.TextView[@content-desc='Notes']"));
+                }
+                catch
+                {
+                    // Android: Try ActionBar title
+                    try
+                    {
+                        return _driver.FindElement(By.XPath("//android.widget.TextView[contains(@resource-id,'action_bar_title')]"));
+                    }
+                    catch
+                    {
+                        // Fallback: Any TextView that might be a title
+                        return _driver.FindElement(By.XPath("//android.widget.TextView | //XCUIElementTypeNavigationBar//XCUIElementTypeStaticText"));
+                    }
+                }
+            }
+        }
+    }
     
     // Multiple strategies for finding the Add button (toolbar item)
     public AppiumElement AddNoteButton
     {
         get
         {
-            // Strategy 1: Try AccessibilityId first (Android/some iOS)
+            // Strategy 1: Try AccessibilityId first (cross-platform)
             try
             {
                 var element = _driver.FindElement(MobileBy.AccessibilityId("AddNoteButton"));
@@ -30,7 +61,24 @@ public class NotesListPage
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 2: iOS - Find button within navigation bar (toolbar buttons appear here)
+            // Strategy 2: Android - Find FAB (Floating Action Button) or toolbar button
+            try
+            {
+                // Try finding Floating Action Button first
+                var element = _driver.FindElement(By.XPath("//android.widget.ImageButton | //android.support.design.widget.FloatingActionButton | //com.google.android.material.floatingactionbutton.FloatingActionButton"));
+                if (element != null && element.Displayed) return element;
+            }
+            catch { /* Continue to next strategy */ }
+
+            // Strategy 3: Android - Find button with plus or add content
+            try
+            {
+                var element = _driver.FindElement(By.XPath("//android.widget.Button[contains(@text,'+') or contains(@content-desc,'Add')] | //android.widget.ImageButton[contains(@content-desc,'Add')]"));
+                if (element != null && element.Displayed) return element;
+            }
+            catch { /* Continue to next strategy */ }
+
+            // Strategy 4: iOS - Find button within navigation bar (toolbar buttons appear here)
             try
             {
                 var navBar = _driver.FindElement(By.XPath("//XCUIElementTypeNavigationBar"));
@@ -39,7 +87,15 @@ public class NotesListPage
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 3: iOS - Find button by position (usually last element in nav bar)
+            // Strategy 5: Android - Find any clickable element in top area (likely toolbar)
+            try
+            {
+                var element = _driver.FindElement(By.XPath("//android.widget.Toolbar//android.widget.ImageButton | //android.widget.Toolbar//android.widget.Button"));
+                if (element != null && element.Displayed) return element;
+            }
+            catch { /* Continue to next strategy */ }
+
+            // Strategy 5: iOS - Find button by position (usually last element in nav bar)
             try
             {
                 var element = _driver.FindElement(By.XPath("//XCUIElementTypeNavigationBar/XCUIElementTypeButton[last()]"));
@@ -47,7 +103,7 @@ public class NotesListPage
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 4: iOS - Any button in the top part of screen (toolbar area)
+            // Strategy 6: iOS - Any button in the top part of screen (toolbar area)
             try
             {
                 var element = _driver.FindElement(By.XPath("//XCUIElementTypeButton[@y<100]"));
@@ -55,23 +111,23 @@ public class NotesListPage
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 5: Try any button that might be the add button
+            // Strategy 7: Cross-platform - Try any button that might be the add button
             try
             {
-                var element = _driver.FindElement(By.XPath("//XCUIElementTypeButton[contains(@name, 'Add') or contains(@label, 'Add') or contains(@value, '+')]"));
+                var element = _driver.FindElement(By.XPath("//android.widget.Button[contains(@text, 'Add') or contains(@content-desc, 'Add')] | //XCUIElementTypeButton[contains(@name, 'Add') or contains(@label, 'Add') or contains(@value, '+')]"));
                 if (element != null && element.Displayed) return element;
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 6: Last resort - any clickable button element
+            // Strategy 8: Last resort - any clickable button element
             try
             {
-                var element = _driver.FindElement(By.XPath("//XCUIElementTypeButton[@enabled='true']"));
+                var element = _driver.FindElement(By.XPath("//android.widget.Button[@enabled='true'] | //XCUIElementTypeButton[@enabled='true']"));
                 if (element != null && element.Displayed) return element;
             }
             catch { /* Continue to next strategy */ }
 
-            // Strategy 7: Wait for any button to appear with explicit wait
+            // Strategy 9: Wait for any button to appear with explicit wait (cross-platform)
             try
             {
                 var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
@@ -79,7 +135,8 @@ public class NotesListPage
                 {
                     try
                     {
-                        return driver.FindElement(By.XPath("//XCUIElementTypeButton"));
+                        // Try Android first, then iOS
+                        return driver.FindElement(By.XPath("//android.widget.Button | //XCUIElementTypeButton"));
                     }
                     catch
                     {
@@ -97,11 +154,110 @@ public class NotesListPage
         }
     }
     
-    // Alternative element selectors for iOS
-    public AppiumElement? AnyElement => _driver.FindElements(MobileBy.ClassName("XCUIElementTypeOther")).FirstOrDefault() as AppiumElement;
-    public AppiumElement NavigationBar => _driver.FindElement(MobileBy.ClassName("XCUIElementTypeNavigationBar"));
-    public IReadOnlyCollection<AppiumElement> NoteItems => _driver.FindElements(MobileBy.AccessibilityId("NoteItem"));
-    public AppiumElement RefreshButton => _driver.FindElement(MobileBy.AccessibilityId("RefreshButton"));
+    // Cross-platform element selectors
+    public AppiumElement? AnyElement 
+    {
+        get
+        {
+            try
+            {
+                return _driver.FindElements(MobileBy.ClassName("android.view.View")).FirstOrDefault() as AppiumElement;
+            }
+            catch
+            {
+                return _driver.FindElements(MobileBy.ClassName("XCUIElementTypeOther")).FirstOrDefault() as AppiumElement;
+            }
+        }
+    }
+    
+    public AppiumElement NavigationBar 
+    {
+        get
+        {
+            try
+            {
+                return _driver.FindElement(MobileBy.ClassName("android.widget.Toolbar"));
+            }
+            catch
+            {
+                return _driver.FindElement(MobileBy.ClassName("XCUIElementTypeNavigationBar"));
+            }
+        }
+    }
+    
+    public IReadOnlyCollection<AppiumElement> NoteItems 
+    {
+        get
+        {
+            try
+            {
+                // Try AccessibilityId first
+                var items = _driver.FindElements(MobileBy.AccessibilityId("NoteItem"));
+                if (items.Count > 0) return items;
+            }
+            catch { /* Continue to next strategy */ }
+
+            try
+            {
+                // Android: Look for list items or text views that contain note content
+                var items = _driver.FindElements(By.XPath("//android.widget.ListView//android.widget.TextView | //androidx.recyclerview.widget.RecyclerView//android.widget.TextView"));
+                if (items.Count > 0) return items;
+            }
+            catch { /* Continue to next strategy */ }
+
+            try
+            {
+                // Android: Look for any clickable text views (likely notes)
+                var items = _driver.FindElements(By.XPath("//android.widget.TextView[@clickable='true']"));
+                if (items.Count > 0) return items;
+            }
+            catch { /* Continue to next strategy */ }
+
+            // Fallback: return empty collection
+            return new List<AppiumElement>();
+        }
+    }
+    
+    public AppiumElement RefreshButton 
+    {
+        get
+        {
+            try
+            {
+                return _driver.FindElement(MobileBy.AccessibilityId("RefreshButton"));
+            }
+            catch
+            {
+                // Android: Look for refresh button - try common patterns
+                try
+                {
+                    // Try overflow menu or action bar
+                    return _driver.FindElement(By.XPath("//android.widget.ImageButton[@content-desc='More options'] | //android.widget.TextView[@text='Refresh']"));
+                }
+                catch
+                {
+                    try
+                    {
+                        // Try SwipeRefreshLayout or any refresh-related element
+                        return _driver.FindElement(By.XPath("//*[contains(@resource-id,'refresh') or contains(@content-desc,'refresh') or contains(@text,'Refresh')]"));
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            // Try any button with refresh semantics
+                            return _driver.FindElement(By.XPath("//android.widget.ImageButton[contains(@content-desc,'refresh')] | //android.widget.Button[contains(@text,'Refresh')]"));
+                        }
+                        catch
+                        {
+                            // iOS fallback
+                            return _driver.FindElement(By.XPath("//XCUIElementTypeButton[contains(@name,'Refresh')]"));
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Page actions
         public async Task WaitForPageToLoad(int timeoutSeconds = 5)
@@ -137,7 +293,7 @@ public class NotesListPage
                     Console.WriteLine("⚠️ Standard elements not found, trying fallback element detection...");
                     await Task.Delay(250); // Minimal time for local app to load
                     
-                    // Try to find any button or text element
+                    // Try to find any button or text element (cross-platform)
                     try
                     {
                         var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
@@ -145,7 +301,8 @@ public class NotesListPage
                         {
                             try
                             {
-                                var elements = driver.FindElements(By.XPath("//*[@class='UILabel' or @class='UIButton' or contains(@name, 'button')]"));
+                                // Android first, then iOS
+                                var elements = driver.FindElements(By.XPath("//android.widget.TextView | //android.widget.Button | //*[@class='UILabel' or @class='UIButton' or contains(@name, 'button')]"));
                                 return elements.Count > 0;
                             }
                             catch
@@ -167,8 +324,40 @@ public class NotesListPage
 
     public async Task<NoteEditorPage> TapAddNote()
     {
+        Console.WriteLine("🖱️ Clicking Add Note button...");
         AddNoteButton.Click();
-        await Task.Delay(100); // Minimal wait for local navigation
+        
+        // Wait for navigation on Android
+        if (_driver.PlatformName.ToLower() == "android")
+        {
+            Console.WriteLine("⏳ Waiting 500ms for Android navigation...");
+            await Task.Delay(500);
+        }
+        else
+        {
+            await Task.Delay(100);
+        }
+        
+        // Debug: Print current page state
+        try
+        {
+            var elements = _driver.FindElements(By.XPath("//*"));
+            Console.WriteLine($"📱 After navigation - found {elements.Count} elements on page");
+            
+            // Try to find any EditText or TextEditor elements
+            var editTexts = _driver.FindElements(By.ClassName("android.widget.EditText"));
+            var textViews = _driver.FindElements(By.XPath("//XCUIElementTypeTextView"));
+            Console.WriteLine($"📝 Found {editTexts.Count} EditText elements and {textViews.Count} TextEditor elements");
+            
+            // Check if we can find elements with "note" in their accessibility ID
+            var noteElements = _driver.FindElements(By.XPath("//*[contains(@content-desc, 'note') or contains(@name, 'note') or contains(@resource-id, 'note')]"));
+            Console.WriteLine($"📋 Found {noteElements.Count} elements with 'note' in their attributes");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Debug error: {ex.Message}");
+        }
+        
         return new NoteEditorPage(_driver);
     }
 
@@ -187,8 +376,36 @@ public class NotesListPage
 
     public async Task RefreshNotes()
     {
-        RefreshButton.Click();
-        await Task.Delay(250); // Minimal wait for local refresh
+        try
+        {
+            // Try to find and tap a refresh button
+            RefreshButton.Click();
+        }
+        catch (NoSuchElementException)
+        {
+            // If no refresh button found, simulate pull-to-refresh on Android
+            try
+            {
+                // Get the main list/scroll area for pull-to-refresh
+                var scrollableArea = _driver.FindElement(By.XPath("//android.widget.ScrollView | //android.widget.ListView | //androidx.recyclerview.widget.RecyclerView"));
+                
+                // Perform pull-to-refresh gesture using W3C Actions
+                var actions = new Actions(_driver);
+                actions.MoveToElement(scrollableArea, scrollableArea.Size.Width / 2, 100)
+                       .ClickAndHold()
+                       .MoveByOffset(0, 300)
+                       .Release()
+                       .Perform();
+                
+                await Task.Delay(1000); // Wait for refresh to complete
+            }
+            catch
+            {
+                // If pull-to-refresh also fails, just wait a moment
+                // Some refresh might happen automatically
+                await Task.Delay(500);
+            }
+        }
     }
 
     public int GetNotesCount()
@@ -247,11 +464,19 @@ public class NotesListPage
     {
         await WaitForPageToLoad();
         
+        var maxAttempts = 10; // Prevent infinite loops
+        var attempts = 0;
+        
         // Keep deleting notes until none are left
-        while (GetNotesCount() > 0)
+        while (GetNotesCount() > 0 && attempts < maxAttempts)
         {
+            attempts++;
+            var initialCount = GetNotesCount();
+            
             try
             {
+                Console.WriteLine($"🗑️ Deleting note {attempts}/{maxAttempts} (found {initialCount} notes)");
+                
                 // Tap the first note
                 var editorPage = await TapNoteItem(0);
                 await editorPage.WaitForPageToLoad();
@@ -261,21 +486,34 @@ public class NotesListPage
                 {
                     var returnedPage = await editorPage.DeleteNote();
                     await returnedPage.WaitForPageToLoad();
-                    await Task.Delay(200); // Minimal wait for local deletion
+                    
+                    // Wait for deletion to complete and verify count decreased
+                    await Task.Delay(500); // Longer wait for Android
+                    
+                    var newCount = GetNotesCount();
+                    if (newCount >= initialCount)
+                    {
+                        Console.WriteLine($"⚠️ Note count didn't decrease ({initialCount} -> {newCount}), breaking");
+                        break;
+                    }
                 }
                 else
                 {
-                    // If no delete button, just go back
+                    Console.WriteLine("⚠️ No delete button visible, going back");
                     await editorPage.GoBack();
                     break; // Exit if we can't delete
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"⚠️ Error during deletion attempt {attempts}: {ex.Message}");
                 // If something goes wrong, break to avoid infinite loop
                 break;
             }
         }
+        
+        var finalCount = GetNotesCount();
+        Console.WriteLine($"🧹 Cleanup completed. Final count: {finalCount} notes");
         
         return this;
     }

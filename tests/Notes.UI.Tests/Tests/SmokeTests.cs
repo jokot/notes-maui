@@ -34,7 +34,7 @@ public class SmokeTests : BaseUITest
 
         // Act
         var editorPage = await _notesListPage.TapAddNote();
-        await editorPage.WaitForPageToLoad();
+        await editorPage.WaitForPageToLoad(timeoutSeconds: 10); // Increased timeout for Android
 
         // Assert - Should be on note editor page
         // Note: Title verification skipped for now due to iOS AutomationId issues
@@ -172,6 +172,11 @@ public class SmokeTests : BaseUITest
         // Arrange
         await EnsureCleanAppState();
         
+        // Verify clean state
+        await _notesListPage!.WaitForPageToLoad();
+        var cleanStateCount = _notesListPage.GetNotesCount();
+        Console.WriteLine($"🧹 Clean state verified: {cleanStateCount} notes");
+        
         // Create a known number of test notes
         await CreateTestNote("Test Note 1");
         await CreateTestNote("Test Note 2");
@@ -179,12 +184,15 @@ public class SmokeTests : BaseUITest
         
         await _notesListPage!.WaitForPageToLoad();
         var initialNotesCount = _notesListPage.GetNotesCount();
+        Console.WriteLine($"📝 Created 3 notes, found: {initialNotesCount} notes");
 
         // Act
         await _notesListPage.RefreshNotes();
 
         // Assert
         var finalNotesCount = _notesListPage.GetNotesCount();
+        Console.WriteLine($"🔄 After refresh, found: {finalNotesCount} notes");
+        
         Assert.Equal(initialNotesCount, finalNotesCount);
         Assert.Equal(3, finalNotesCount); // Should have exactly 3 notes we created
     }
@@ -198,7 +206,7 @@ public class SmokeTests : BaseUITest
     private async Task CreateTestNote(string noteText)
     {
         var editorPage = await _notesListPage!.TapAddNote();
-        await editorPage.WaitForPageToLoad();
+        await editorPage.WaitForPageToLoad(timeoutSeconds: 10); // Increased timeout for Android
         await editorPage.EnterText(noteText);
         _notesListPage = await editorPage.SaveNote();
         await _notesListPage.WaitForPageToLoad();

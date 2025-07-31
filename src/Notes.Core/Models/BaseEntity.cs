@@ -1,5 +1,3 @@
-using System;
-
 namespace Notes.Core.Models;
 
 public abstract class BaseEntity

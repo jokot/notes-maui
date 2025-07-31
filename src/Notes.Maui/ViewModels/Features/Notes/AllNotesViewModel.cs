@@ -6,30 +6,24 @@ public partial class AllNotesViewModel : BaseViewModel
     bool isRefreshing;
     public ObservableCollection<Note> Notes { get; } = [];
 
-    private readonly GetAllNotesHandler _getAllNotesHandler;
-    private readonly RefreshNotesHandler _refreshNotesHandler;
+    private readonly IMediator _mediator;
 
     public AllNotesViewModel(
-        GetAllNotesHandler getAllNotesHandler, 
-        RefreshNotesHandler refreshNotesHandler,
+        IMediator mediator,
         INavigationService navigationService, 
         ILogger<AllNotesViewModel> logger)
         : base(navigationService, logger)
     {
         Title = "Your Notes";
-        _getAllNotesHandler = getAllNotesHandler;
-        _refreshNotesHandler = refreshNotesHandler;
+        _mediator = mediator;
     }
 
     public async Task GetNotesAsync()
     {
         await ExecuteAsync(async () =>
         {
-            // Create command to get all notes
-            var command = new GetAllNotesCommand();
-            
-            // Use handler to process the command
-            var notes = await _getAllNotesHandler.HandleAsync(command);
+            // Use MediatR to send query
+            var notes = await _mediator.Send(new GetAllNotesQuery());
             
             Notes.Clear();
             foreach (var note in notes)
@@ -44,11 +38,11 @@ public partial class AllNotesViewModel : BaseViewModel
         {
             IsRefreshing = true;
             
-            // Create command for forced refresh
-            var command = new RefreshNotesCommand();
+            // Use MediatR to send refresh query
+            await _mediator.Send(new RefreshNotesQuery());
             
-            // Use dedicated refresh handler to bypass cache
-            var notes = await _refreshNotesHandler.HandleAsync(command);
+            // Then get all notes to update the UI
+            var notes = await _mediator.Send(new GetAllNotesQuery());
             
             Notes.Clear();
             foreach (var note in notes)

@@ -13,15 +13,8 @@ public class NoteServiceIntegrationTests : IDisposable
         
         var services = new ServiceCollection();
         
-        // Register Core services as Singletons for consistent cache state within tests
-        services.AddLogging();
-        services.AddSingleton<IFileDataService>(sp => 
-            new FileDataService(sp.GetRequiredService<ILogger<FileDataService>>(), _testDataPath));
-        services.AddSingleton<IRepository<Note>, NoteRepository>();
-        services.AddSingleton<SaveNoteHandler>();
-        services.AddSingleton<GetAllNotesHandler>();
-        services.AddSingleton<RefreshNotesHandler>();
-        services.AddSingleton<DeleteNoteHandler>();
+        // Use the Core service registration to ensure consistency with MediatR
+        services.AddCoreServices(_testDataPath);
         
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -33,14 +26,13 @@ public class NoteServiceIntegrationTests : IDisposable
     public async Task SaveAndRetrieveNote_Integration_WorksCorrectly()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
         var note = new Note { Text = "This is a test note for integration testing" };
         var saveCommand = new SaveNoteCommand(note);
 
         // Act
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
-        var allNotes = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var savedNote = await mediator.Send(saveCommand);
+        var allNotes = await mediator.Send(new GetAllNotesQuery());
 
         // Assert
         Assert.NotNull(savedNote);
@@ -55,26 +47,24 @@ public class NoteServiceIntegrationTests : IDisposable
     public async Task SaveUpdateDeleteNote_FullWorkflow_WorksCorrectly()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
-        var deleteHandler = _serviceProvider.GetRequiredService<DeleteNoteHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
 
         // Create a note
         var note = new Note { Text = "Original content" };
         var saveCommand = new SaveNoteCommand(note);
-        var createdNote = await saveHandler.HandleAsync(saveCommand);
+        var createdNote = await mediator.Send(saveCommand);
 
         // Update the note
         createdNote.Text = $"Updated content {Guid.NewGuid()}";
         var updateCommand = new SaveNoteCommand(createdNote);
-        var savedUpdatedNote = await saveHandler.HandleAsync(updateCommand);
+        var savedUpdatedNote = await mediator.Send(updateCommand);
 
         // Delete the note
         var deleteCommand = new DeleteNoteCommand(savedUpdatedNote);
-        await deleteHandler.HandleAsync(deleteCommand);
+        await mediator.Send(deleteCommand);
 
         // Verify final state
-        var finalNotes = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var finalNotes = await mediator.Send(new GetAllNotesQuery());
 
         // Assert
         Assert.NotNull(createdNote);

@@ -4,6 +4,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCoreServices(this IServiceCollection services, string? dataPath = null)
     {
+        // Logging - Required for all services and MediatR
+        services.AddLogging();
+
+        // MediatR Registration
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
+
         // Core Services - Configure FileDataService with provided data path
         services.AddSingleton<IFileDataService>(serviceProvider =>
         {
@@ -13,12 +19,6 @@ public static class ServiceCollectionExtensions
 
         // Repositories
         services.AddSingleton<IRepository<Note>, NoteRepository>();
-
-        // CQRS Handlers
-        services.AddSingleton<SaveNoteHandler>();
-        services.AddSingleton<DeleteNoteHandler>();
-        services.AddSingleton<GetAllNotesHandler>();
-        services.AddSingleton<RefreshNotesHandler>();
 
         return services;
     }

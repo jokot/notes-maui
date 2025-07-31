@@ -19,7 +19,7 @@ public class SaveNoteHandlerTests
     [Trait("Category", "Unit")]
     [Trait("Category", "Fast")]
     [Trait("Category", "Handlers")]
-    public async Task HandleAsync_NewNote_CallsAddAsync()
+    public async Task Handle_NewNote_CallsAddAsync()
     {
         // Arrange
         var note = new Note { Text = "Test Content" }; // No filename = new note
@@ -36,7 +36,7 @@ public class SaveNoteHandlerTests
         _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ReturnsAsync(expectedNote);
 
         // Act
-        var result = await _handler.HandleAsync(command);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -49,7 +49,7 @@ public class SaveNoteHandlerTests
     [Trait("Category", "Unit")]
     [Trait("Category", "Fast")]
     [Trait("Category", "Handlers")]
-    public async Task HandleAsync_ExistingNote_CallsUpdateAsync()
+    public async Task Handle_ExistingNote_CallsUpdateAsync()
     {
         // Arrange
         var existingFileName = "existing-file.notes.txt";
@@ -72,7 +72,7 @@ public class SaveNoteHandlerTests
         _mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Note>())).ReturnsAsync(expectedNote);
 
         // Act
-        var result = await _handler.HandleAsync(command);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>()), Times.Once);
@@ -85,7 +85,7 @@ public class SaveNoteHandlerTests
     [Trait("Category", "Unit")]
     [Trait("Category", "Fast")]
     [Trait("Category", "Handlers")]
-    public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
+    public async Task Handle_RepositoryThrowsException_RethrowsException()
     {
         // Arrange
         var note = new Note { Text = "Test Content" };
@@ -96,6 +96,6 @@ public class SaveNoteHandlerTests
         _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ThrowsAsync(exception);
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _handler.HandleAsync(command));
+        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(command, CancellationToken.None));
     }
 } 

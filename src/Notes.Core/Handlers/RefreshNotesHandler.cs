@@ -1,6 +1,6 @@
 namespace Notes.Core.Handlers;
 
-public class RefreshNotesHandler
+public class RefreshNotesHandler : IRequestHandler<RefreshNotesQuery>
 {
     private readonly IRepository<Note> _noteRepository;
     private readonly ILogger<RefreshNotesHandler> _logger;
@@ -13,11 +13,11 @@ public class RefreshNotesHandler
         _logger = logger;
     }
 
-    public async Task<IEnumerable<Note>> HandleAsync(RefreshNotesCommand command)
+    public async Task Handle(RefreshNotesQuery query, CancellationToken cancellationToken)
     {
         try
         {
-            return await _noteRepository.GetAllForceAsync();
+            await _noteRepository.GetAllForceAsync();
         }
         catch (Exception ex)
         {

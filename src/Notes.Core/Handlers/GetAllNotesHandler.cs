@@ -1,6 +1,6 @@
 namespace Notes.Core.Handlers;
 
-public class GetAllNotesHandler
+public class GetAllNotesHandler : IRequestHandler<GetAllNotesQuery, IEnumerable<Note>>
 {
     private readonly IRepository<Note> _noteRepository;
     private readonly ILogger<GetAllNotesHandler> _logger;
@@ -13,7 +13,7 @@ public class GetAllNotesHandler
         _logger = logger;
     }
 
-    public async Task<IEnumerable<Note>> HandleAsync(GetAllNotesCommand command)
+    public async Task<IEnumerable<Note>> Handle(GetAllNotesQuery query, CancellationToken cancellationToken)
     {
         try
         {

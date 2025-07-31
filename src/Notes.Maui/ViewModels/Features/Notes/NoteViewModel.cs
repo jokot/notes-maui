@@ -3,19 +3,16 @@ namespace Notes.Maui.ViewModels.Features.Notes;
 [QueryProperty(nameof(Note), nameof(Note))]
 public partial class NoteViewModel : BaseViewModel
 {
-    private readonly SaveNoteHandler _saveNoteHandler;
-    private readonly DeleteNoteHandler _deleteNoteHandler;
+    private readonly IMediator _mediator;
 
     public NoteViewModel(
-        SaveNoteHandler saveNoteHandler, 
-        DeleteNoteHandler deleteNoteHandler,
+        IMediator mediator,
         INavigationService navigationService, 
         ILogger<NoteViewModel> logger)
         : base(navigationService, logger)
     {
         Title = "Note";
-        _saveNoteHandler = saveNoteHandler;
-        _deleteNoteHandler = deleteNoteHandler;
+        _mediator = mediator;
         note = new Note();
     }
 
@@ -32,8 +29,8 @@ public partial class NoteViewModel : BaseViewModel
                 // Create command with the note object
                 var command = new SaveNoteCommand(Note);
 
-                // Use handler to process the command
-                var savedNote = await _saveNoteHandler.HandleAsync(command);
+                // Use MediatR to send the command
+                var savedNote = await _mediator.Send(command);
                 
                 // Update the current note with saved data
                 Note = savedNote;
@@ -52,8 +49,8 @@ public partial class NoteViewModel : BaseViewModel
                 // Create command with the full Note object
                 var command = new DeleteNoteCommand(Note);
 
-                // Use handler to process the command
-                var success = await _deleteNoteHandler.HandleAsync(command);
+                // Use MediatR to send the command
+                var success = await _mediator.Send(command);
                 
                 if (success)
                 {

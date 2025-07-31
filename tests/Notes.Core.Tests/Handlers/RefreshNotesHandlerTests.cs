@@ -17,61 +17,32 @@ public class RefreshNotesHandlerTests
     [Trait("Category", "Unit")]
     [Trait("Category", "Fast")]
     [Trait("Category", "Handlers")]
-    public async Task HandleAsync_ReturnsNotesFromRepositoryForceRefresh()
+    public async Task Handle_CallsRepositoryForceRefresh()
     {
         // Arrange
-        var command = new RefreshNotesCommand();
-        var expectedNotes = new List<Note>
-        {
-            new() { Id = "1", Text = "Note 1", Filename = "note1.txt" },
-            new() { Id = "2", Text = "Note 2", Filename = "note2.txt" }
-        };
-
-        _mockRepository.Setup(x => x.GetAllForceAsync()).ReturnsAsync(expectedNotes);
+        var query = new RefreshNotesQuery();
 
         // Act
-        var result = await _handler.HandleAsync(command);
+        await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         _mockRepository.Verify(x => x.GetAllForceAsync(), Times.Once);
         _mockRepository.Verify(x => x.GetAllAsync(), Times.Never); // Should not call regular GetAll
-        Assert.Equal(expectedNotes.Count, result.Count());
-        Assert.Equal(expectedNotes, result);
     }
 
     [Fact]
     [Trait("Category", "Unit")]
     [Trait("Category", "Fast")]
     [Trait("Category", "Handlers")]
-    public async Task HandleAsync_EmptyRepository_ReturnsEmptyCollection()
+    public async Task Handle_RepositoryThrowsException_RethrowsException()
     {
         // Arrange
-        var command = new RefreshNotesCommand();
-        var expectedNotes = new List<Note>();
-
-        _mockRepository.Setup(x => x.GetAllForceAsync()).ReturnsAsync(expectedNotes);
-
-        // Act
-        var result = await _handler.HandleAsync(command);
-
-        // Assert
-        _mockRepository.Verify(x => x.GetAllForceAsync(), Times.Once);
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    [Trait("Category", "Unit")]
-    [Trait("Category", "Fast")]
-    [Trait("Category", "Handlers")]
-    public async Task HandleAsync_RepositoryThrowsException_RethrowsException()
-    {
-        // Arrange
-        var command = new RefreshNotesCommand();
+        var query = new RefreshNotesQuery();
         var exception = new Exception("Repository error");
 
         _mockRepository.Setup(x => x.GetAllForceAsync()).ThrowsAsync(exception);
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _handler.HandleAsync(command));
+        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
     }
 } 

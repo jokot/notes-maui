@@ -13,15 +13,8 @@ public class HandlerIntegrationTests : IDisposable
         
         var services = new ServiceCollection();
         
-        // Register Core services as Singletons for consistent cache state within tests
-        services.AddLogging();
-        services.AddSingleton<IFileDataService>(sp => 
-            new FileDataService(sp.GetRequiredService<ILogger<FileDataService>>(), _testDataPath));
-        services.AddSingleton<IRepository<Note>, NoteRepository>();
-        services.AddSingleton<SaveNoteHandler>();
-        services.AddSingleton<GetAllNotesHandler>();
-        services.AddSingleton<RefreshNotesHandler>();
-        services.AddSingleton<DeleteNoteHandler>();
+        // Use the Core service registration to ensure consistency
+        services.AddCoreServices(_testDataPath);
         
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -33,12 +26,12 @@ public class HandlerIntegrationTests : IDisposable
     public async Task SaveNoteHandler_WithRepository_IntegratesCorrectly()
     {
         // Arrange
-        var handler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
         var note = new Note { Text = "Handler integration test content" };
         var command = new SaveNoteCommand(note);
 
         // Act
-        var result = await handler.HandleAsync(command);
+        var result = await mediator.Send(command);
 
         // Assert
         Assert.NotNull(result);
@@ -54,21 +47,19 @@ public class HandlerIntegrationTests : IDisposable
     public async Task DeleteNoteHandler_WithValidNote_IntegratesCorrectly()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var deleteHandler = _serviceProvider.GetRequiredService<DeleteNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
 
         // First create a note to delete
         var note = new Note { Text = "This note will be deleted" };
         var saveCommand = new SaveNoteCommand(note);
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
+        var savedNote = await mediator.Send(saveCommand);
 
         // Act
         var deleteCommand = new DeleteNoteCommand(savedNote);
-        var result = await deleteHandler.HandleAsync(deleteCommand);
+        var result = await mediator.Send(deleteCommand);
 
         // Verify deletion by checking repository state
-        var notesAfterDelete = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesAfterDelete = await mediator.Send(new GetAllNotesQuery());
         var noteExistsAfterDelete = notesAfterDelete.Any(n => n.Id == savedNote.Id);
 
         // Assert
@@ -83,25 +74,23 @@ public class HandlerIntegrationTests : IDisposable
     public async Task DeleteNoteHandler_IsolatedTest_WorksCorrectly()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var deleteHandler = _serviceProvider.GetRequiredService<DeleteNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
 
         // Create a note
         var note = new Note { Text = "Isolated Test" };
         var saveCommand = new SaveNoteCommand(note);
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
+        var savedNote = await mediator.Send(saveCommand);
 
         // Verify it exists before deletion
-        var notesBeforeDelete = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesBeforeDelete = await mediator.Send(new GetAllNotesQuery());
         var noteExistsBefore = notesBeforeDelete.Any(n => n.Id == savedNote.Id);
 
         // Act - Delete the note
         var deleteCommand = new DeleteNoteCommand(savedNote);
-        var deleteResult = await deleteHandler.HandleAsync(deleteCommand);
+        var deleteResult = await mediator.Send(deleteCommand);
 
         // Verify deletion
-        var notesAfterDelete = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesAfterDelete = await mediator.Send(new GetAllNotesQuery());
         var noteExistsAfter = notesAfterDelete.Any(n => n.Id == savedNote.Id);
 
         // Assert
@@ -117,19 +106,18 @@ public class HandlerIntegrationTests : IDisposable
     public async Task GetAllNotesHandler_WithMultipleNotes_ReturnsAllNotes()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
         
         // Create multiple notes
         var note1 = new Note { Text = "Content 1" };
         var note2 = new Note { Text = "Content 2" };
-        await saveHandler.HandleAsync(new SaveNoteCommand(note1));
-        await saveHandler.HandleAsync(new SaveNoteCommand(note2));
+        await mediator.Send(new SaveNoteCommand(note1));
+        await mediator.Send(new SaveNoteCommand(note2));
         
-        var command = new GetAllNotesCommand();
+        var query = new GetAllNotesQuery();
 
         // Act
-        var result = await getAllHandler.HandleAsync(command);
+        var result = await mediator.Send(query);
 
         // Assert
         Assert.NotNull(result);
@@ -142,33 +130,21 @@ public class HandlerIntegrationTests : IDisposable
     [Trait("Category", "Handlers")]
     public async Task CommandHandlerPipeline_FullWorkflow_IntegratesCorrectly()
     {
-        // Arrange - Create isolated service provider for consistent state
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddSingleton<IFileDataService>(sp => 
-            new FileDataService(sp.GetRequiredService<ILogger<FileDataService>>(), _testDataPath));
-        services.AddSingleton<IRepository<Note>, NoteRepository>();
-        services.AddSingleton<SaveNoteHandler>();
-        services.AddSingleton<GetAllNotesHandler>();
-        services.AddSingleton<RefreshNotesHandler>();
-        services.AddSingleton<DeleteNoteHandler>();
-        var serviceProvider = services.BuildServiceProvider();
-
-        var saveHandler = serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var deleteHandler = serviceProvider.GetRequiredService<DeleteNoteHandler>();
-        var fileDataService = serviceProvider.GetRequiredService<IFileDataService>();
+        // Arrange - Use the same service provider with MediatR
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
+        var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
 
         // Act - Execute full CQRS pipeline with unique text
         var uniqueText = $"Testing the full command handler pipeline {Guid.NewGuid()}";
         var note = new Note { Text = uniqueText };
         var saveCommand = new SaveNoteCommand(note);
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
+        var savedNote = await mediator.Send(saveCommand);
         
         // Verify file was created
         var fileExists = await fileDataService.NoteExistsAsync(savedNote.Filename);
         
         var deleteCommand = new DeleteNoteCommand(savedNote);
-        var deleteResult = await deleteHandler.HandleAsync(deleteCommand);
+        var deleteResult = await mediator.Send(deleteCommand);
         
         // Verify file was deleted
         var fileExistsAfterDelete = await fileDataService.NoteExistsAsync(savedNote.Filename);
@@ -188,8 +164,7 @@ public class HandlerIntegrationTests : IDisposable
     public async Task DebugSaveAndLoad_TraceProblem()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
         var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
 
         // Create a unique note for this test
@@ -198,7 +173,7 @@ public class HandlerIntegrationTests : IDisposable
         var saveCommand = new SaveNoteCommand(note);
         
         // Act - Save note
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
+        var savedNote = await mediator.Send(saveCommand);
         
         // Debug: Check if file was actually created
         var fileExists = await fileDataService.NoteExistsAsync(savedNote.Filename);
@@ -208,7 +183,7 @@ public class HandlerIntegrationTests : IDisposable
         var noteFromFileService = notesFromFileService.FirstOrDefault(n => n.Text == uniqueText);
         
         // Debug: Load notes through repository
-        var notesFromRepository = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesFromRepository = await mediator.Send(new GetAllNotesQuery());
         var noteFromRepository = notesFromRepository.FirstOrDefault(n => n.Text == uniqueText);
 
         // Assert with detailed information
@@ -225,9 +200,7 @@ public class HandlerIntegrationTests : IDisposable
     public async Task DebugDeleteOperation_TraceProblem()
     {
         // Arrange
-        var saveHandler = _serviceProvider.GetRequiredService<SaveNoteHandler>();
-        var deleteHandler = _serviceProvider.GetRequiredService<DeleteNoteHandler>();
-        var getAllHandler = _serviceProvider.GetRequiredService<GetAllNotesHandler>();
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
         var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
 
         // Create a unique note for this test to avoid conflicts
@@ -236,10 +209,10 @@ public class HandlerIntegrationTests : IDisposable
         var saveCommand = new SaveNoteCommand(note);
         
         // Act - Save note
-        var savedNote = await saveHandler.HandleAsync(saveCommand);
+        var savedNote = await mediator.Send(saveCommand);
         
         // Debug 1: Verify it exists in repository
-        var notesBeforeDelete = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesBeforeDelete = await mediator.Send(new GetAllNotesQuery());
         var noteBeforeDelete = notesBeforeDelete.FirstOrDefault(n => n.Id == savedNote.Id);
         
         // Debug 2: Verify file exists
@@ -247,13 +220,13 @@ public class HandlerIntegrationTests : IDisposable
         
         // Delete the note
         var deleteCommand = new DeleteNoteCommand(savedNote);
-        var deleteResult = await deleteHandler.HandleAsync(deleteCommand);
+        var deleteResult = await mediator.Send(deleteCommand);
         
         // Debug 3: Check if file was actually deleted
         var fileExistsAfterDelete = await fileDataService.NoteExistsAsync(savedNote.Filename);
         
         // Debug 4: Check repository state after delete
-        var notesAfterDelete = await getAllHandler.HandleAsync(new GetAllNotesCommand());
+        var notesAfterDelete = await mediator.Send(new GetAllNotesQuery());
         var noteAfterDelete = notesAfterDelete.FirstOrDefault(n => n.Id == savedNote.Id);
 
         // Assert with detailed debug information

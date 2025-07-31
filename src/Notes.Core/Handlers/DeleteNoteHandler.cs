@@ -1,6 +1,6 @@
 namespace Notes.Core.Handlers;
 
-public class DeleteNoteHandler
+public class DeleteNoteHandler : IRequestHandler<DeleteNoteCommand, bool>
 {
     private readonly IRepository<Note> _noteRepository;
     private readonly ILogger<DeleteNoteHandler> _logger;
@@ -13,7 +13,7 @@ public class DeleteNoteHandler
         _logger = logger;
     }
 
-    public async Task<bool> HandleAsync(DeleteNoteCommand command)
+    public async Task<bool> Handle(DeleteNoteCommand command, CancellationToken cancellationToken)
     {
         try
         {

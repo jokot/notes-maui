@@ -1,3 +1,3 @@
 namespace Notes.Core.Commands;
 
-public record SaveNoteCommand(Note Note); 
+public record SaveNoteCommand(Note Note) : IRequest<Note>; 

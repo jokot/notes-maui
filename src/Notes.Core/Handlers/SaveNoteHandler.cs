@@ -1,6 +1,6 @@
 namespace Notes.Core.Handlers;
 
-public class SaveNoteHandler
+public class SaveNoteHandler : IRequestHandler<SaveNoteCommand, Note>
 {
     private readonly IRepository<Note> _noteRepository;
     private readonly IFileDataService _fileDataService;
@@ -16,7 +16,7 @@ public class SaveNoteHandler
         _logger = logger;
     }
 
-    public async Task<Note> HandleAsync(SaveNoteCommand command)
+    public async Task<Note> Handle(SaveNoteCommand command, CancellationToken cancellationToken)
     {
         try
         {
@@ -44,6 +44,4 @@ public class SaveNoteHandler
             throw;
         }
     }
-
-
 } 

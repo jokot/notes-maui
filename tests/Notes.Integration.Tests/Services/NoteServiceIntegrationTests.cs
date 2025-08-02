@@ -17,6 +17,16 @@ public class NoteServiceIntegrationTests : IDisposable
         services.AddCoreServices(_testDataPath);
         
         _serviceProvider = services.BuildServiceProvider();
+        
+        // Initialize the database for testing
+        InitializeDatabaseAsync().GetAwaiter().GetResult();
+    }
+
+    private async Task InitializeDatabaseAsync()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializationService>();
+        await databaseInitializer.InitializeDatabaseAsync();
     }
 
     [Fact]

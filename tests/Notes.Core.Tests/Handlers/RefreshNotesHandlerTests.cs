@@ -26,8 +26,7 @@ public class RefreshNotesHandlerTests
         await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.GetAllForceAsync(), Times.Once);
-        _mockRepository.Verify(x => x.GetAllAsync(), Times.Never); // Should not call regular GetAll
+        _mockRepository.Verify(x => x.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -40,7 +39,7 @@ public class RefreshNotesHandlerTests
         var query = new RefreshNotesQuery();
         var exception = new Exception("Repository error");
 
-        _mockRepository.Setup(x => x.GetAllForceAsync()).ThrowsAsync(exception);
+        _mockRepository.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));

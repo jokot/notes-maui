@@ -22,12 +22,14 @@ public class DeleteNoteHandlerTests
         // Arrange
         var note = new Note { Id = "123", Filename = "test-file.notes.txt", Text = "Test content" };
         var command = new DeleteNoteCommand(note);
+        
+        _mockRepository.Setup(x => x.DeleteAsync(note.Id, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.DeleteAsync(note.Id), Times.Once);
+        _mockRepository.Verify(x => x.DeleteAsync(note.Id, It.IsAny<CancellationToken>()), Times.Once);
         Assert.True(result);
     }
 
@@ -44,7 +46,7 @@ public class DeleteNoteHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.DeleteAsync(It.IsAny<string>()), Times.Never);
+        _mockRepository.Verify(x => x.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         Assert.False(result);
     }
 
@@ -59,7 +61,7 @@ public class DeleteNoteHandlerTests
         var command = new DeleteNoteCommand(note);
         var exception = new Exception("Repository error");
 
-        _mockRepository.Setup(x => x.DeleteAsync(note.Id)).ThrowsAsync(exception);
+        _mockRepository.Setup(x => x.DeleteAsync(note.Id, It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(command, CancellationToken.None));
@@ -74,11 +76,13 @@ public class DeleteNoteHandlerTests
         // Arrange
         var note = new Note { Id = "456", Filename = "another-test.notes.txt", Text = "Another content" };
         var command = new DeleteNoteCommand(note);
+        
+        _mockRepository.Setup(x => x.DeleteAsync("456", It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert - Verify that repository delete was called with correct ID
-        _mockRepository.Verify(x => x.DeleteAsync("456"), Times.Once);
+        _mockRepository.Verify(x => x.DeleteAsync("456", It.IsAny<CancellationToken>()), Times.Once);
     }
 } 

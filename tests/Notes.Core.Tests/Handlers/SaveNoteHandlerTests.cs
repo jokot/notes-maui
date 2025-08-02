@@ -3,16 +3,14 @@ namespace Notes.Core.Tests.Handlers;
 public class SaveNoteHandlerTests
 {
     private readonly Mock<IRepository<Note>> _mockRepository;
-    private readonly Mock<IFileDataService> _mockFileDataService;
     private readonly Mock<ILogger<SaveNoteHandler>> _mockLogger;
     private readonly SaveNoteHandler _handler;
 
     public SaveNoteHandlerTests()
     {
         _mockRepository = new Mock<IRepository<Note>>();
-        _mockFileDataService = new Mock<IFileDataService>();
         _mockLogger = new Mock<ILogger<SaveNoteHandler>>();
-        _handler = new SaveNoteHandler(_mockRepository.Object, _mockFileDataService.Object, _mockLogger.Object);
+        _handler = new SaveNoteHandler(_mockRepository.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -22,7 +20,7 @@ public class SaveNoteHandlerTests
     public async Task Handle_NewNote_CallsAddAsync()
     {
         // Arrange
-        var note = new Note { Text = "Test Content" }; // No filename = new note
+        var note = new Note { Text = "Test Content" }; // No ID = new note
         var command = new SaveNoteCommand(note);
         var expectedNote = new Note
         {
@@ -32,8 +30,8 @@ public class SaveNoteHandlerTests
             UpdatedAt = note.UpdatedAt
         };
 
-        _mockFileDataService.Setup(x => x.GenerateFilename()).Returns("generated-filename.notes.txt");
-        _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ReturnsAsync(expectedNote);
+        _mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((Note?)null);
+        _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>())).ReturnsAsync(expectedNote);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -41,8 +39,8 @@ public class SaveNoteHandlerTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Test Content", result.Text);
-        _mockRepository.Verify(x => x.AddAsync(It.IsAny<Note>()), Times.Once);
-        _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>()), Times.Never);
+        _mockRepository.Verify(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -52,33 +50,40 @@ public class SaveNoteHandlerTests
     public async Task Handle_ExistingNote_CallsUpdateAsync()
     {
         // Arrange
-        var existingFileName = "existing-file.notes.txt";
+        var existingId = "existing-id";
         var note = new Note
         {
-            Filename = existingFileName,
+            Id = existingId,
             Text = "Updated content"
         };
         var command = new SaveNoteCommand(note);
 
+        var existingNote = new Note
+        {
+            Id = existingId,
+            Filename = "existing-file.notes.txt",
+            Text = "Old content"
+        };
+
         var expectedNote = new Note
         {
-            Id = "456",
-            Filename = existingFileName,
+            Id = existingId,
+            Filename = existingNote.Filename,
             Text = note.Text,
             UpdatedAt = note.UpdatedAt
         };
 
-        _mockFileDataService.Setup(x => x.NoteExistsAsync(existingFileName)).ReturnsAsync(true);
-        _mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Note>())).ReturnsAsync(expectedNote);
+        _mockRepository.Setup(x => x.GetByIdAsync(existingId, It.IsAny<CancellationToken>())).ReturnsAsync(existingNote);
+        _mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>())).ReturnsAsync(expectedNote);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>()), Times.Once);
-        _mockRepository.Verify(x => x.AddAsync(It.IsAny<Note>()), Times.Never);
+        _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()), Times.Never);
         Assert.NotNull(result);
-        Assert.Equal(existingFileName, result.Filename);
+        Assert.Equal(existingId, result.Id);
     }
 
     [Fact]
@@ -92,8 +97,8 @@ public class SaveNoteHandlerTests
         var command = new SaveNoteCommand(note);
         var exception = new Exception("Repository error");
 
-        _mockFileDataService.Setup(x => x.GenerateFilename()).Returns("test-filename.notes.txt");
-        _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>())).ThrowsAsync(exception);
+        _mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((Note?)null);
+        _mockRepository.Setup(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(command, CancellationToken.None));

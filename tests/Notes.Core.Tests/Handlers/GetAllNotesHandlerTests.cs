@@ -27,13 +27,13 @@ public class GetAllNotesHandlerTests
             new() { Id = "2", Text = "Note 2", Filename = "note2.txt" }
         };
 
-        _mockRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(expectedNotes);
+        _mockRepository.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(expectedNotes);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.GetAllAsync(), Times.Once);
+        _mockRepository.Verify(x => x.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
         Assert.Equal(expectedNotes.Count, result.Count());
         Assert.Equal(expectedNotes, result);
     }
@@ -48,13 +48,13 @@ public class GetAllNotesHandlerTests
         var query = new GetAllNotesQuery();
         var expectedNotes = new List<Note>();
 
-        _mockRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(expectedNotes);
+        _mockRepository.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(expectedNotes);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        _mockRepository.Verify(x => x.GetAllAsync(), Times.Once);
+        _mockRepository.Verify(x => x.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
         Assert.Empty(result);
     }
 
@@ -68,7 +68,7 @@ public class GetAllNotesHandlerTests
         var query = new GetAllNotesQuery();
         var exception = new Exception("Repository error");
 
-        _mockRepository.Setup(x => x.GetAllAsync()).ThrowsAsync(exception);
+        _mockRepository.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));

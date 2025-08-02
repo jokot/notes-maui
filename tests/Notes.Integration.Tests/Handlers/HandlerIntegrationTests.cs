@@ -17,6 +17,16 @@ public class HandlerIntegrationTests : IDisposable
         services.AddCoreServices(_testDataPath);
         
         _serviceProvider = services.BuildServiceProvider();
+        
+        // Initialize the database for testing
+        InitializeDatabaseAsync().GetAwaiter().GetResult();
+    }
+
+    private async Task InitializeDatabaseAsync()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializationService>();
+        await databaseInitializer.InitializeDatabaseAsync();
     }
 
     [Fact]
@@ -132,7 +142,7 @@ public class HandlerIntegrationTests : IDisposable
     {
         // Arrange - Use the same service provider with MediatR
         var mediator = _serviceProvider.GetRequiredService<IMediator>();
-        var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
+        var noteRepository = _serviceProvider.GetRequiredService<IRepository<Note>>();
 
         // Act - Execute full CQRS pipeline with unique text
         var uniqueText = $"Testing the full command handler pipeline {Guid.NewGuid()}";
@@ -140,21 +150,21 @@ public class HandlerIntegrationTests : IDisposable
         var saveCommand = new SaveNoteCommand(note);
         var savedNote = await mediator.Send(saveCommand);
         
-        // Verify file was created
-        var fileExists = await fileDataService.NoteExistsAsync(savedNote.Filename);
+        // Verify note was created in database
+        var noteExistsInDb = await noteRepository.GetByIdAsync(savedNote.Id) != null;
         
         var deleteCommand = new DeleteNoteCommand(savedNote);
         var deleteResult = await mediator.Send(deleteCommand);
         
-        // Verify file was deleted
-        var fileExistsAfterDelete = await fileDataService.NoteExistsAsync(savedNote.Filename);
+        // Verify note was deleted from database
+        var noteExistsAfterDelete = await noteRepository.GetByIdAsync(savedNote.Id) != null;
 
         // Assert - Focus on the core save/delete operations
         Assert.NotNull(savedNote);
         Assert.NotNull(savedNote.Filename);
-        Assert.True(fileExists, "File should be created after save");
+        Assert.True(noteExistsInDb, "Note should be created in database after save");
         Assert.True(deleteResult, "Delete operation should succeed");
-        Assert.False(fileExistsAfterDelete, "File should be deleted after delete operation");
+        Assert.False(noteExistsAfterDelete, "Note should be deleted from database after delete operation");
     }
 
     [Fact]
@@ -165,7 +175,7 @@ public class HandlerIntegrationTests : IDisposable
     {
         // Arrange
         var mediator = _serviceProvider.GetRequiredService<IMediator>();
-        var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
+        var noteRepository = _serviceProvider.GetRequiredService<IRepository<Note>>();
 
         // Create a unique note for this test
         var uniqueText = $"Debug test note {Guid.NewGuid()}";
@@ -175,12 +185,8 @@ public class HandlerIntegrationTests : IDisposable
         // Act - Save note
         var savedNote = await mediator.Send(saveCommand);
         
-        // Debug: Check if file was actually created
-        var fileExists = await fileDataService.NoteExistsAsync(savedNote.Filename);
-        
-        // Debug: Load notes directly from file service
-        var notesFromFileService = await fileDataService.LoadNotesAsync();
-        var noteFromFileService = notesFromFileService.FirstOrDefault(n => n.Text == uniqueText);
+        // Debug: Check if note was actually created in database
+        var noteExistsInDb = await noteRepository.GetByIdAsync(savedNote.Id) != null;
         
         // Debug: Load notes through repository
         var notesFromRepository = await mediator.Send(new GetAllNotesQuery());
@@ -188,8 +194,7 @@ public class HandlerIntegrationTests : IDisposable
 
         // Assert with detailed information
         Assert.NotNull(savedNote);
-        Assert.True(fileExists, $"File should exist at: {savedNote.Filename}");
-        Assert.True(noteFromFileService != null, $"Note should be found by FileDataService. Found {notesFromFileService.Count} total notes");
+        Assert.True(noteExistsInDb, $"Note should exist in database with ID: {savedNote.Id}");
         Assert.True(noteFromRepository != null, $"Note should be found by Repository. Found {notesFromRepository.Count()} total notes");
     }
 
@@ -201,7 +206,7 @@ public class HandlerIntegrationTests : IDisposable
     {
         // Arrange
         var mediator = _serviceProvider.GetRequiredService<IMediator>();
-        var fileDataService = _serviceProvider.GetRequiredService<IFileDataService>();
+        var noteRepository = _serviceProvider.GetRequiredService<IRepository<Note>>();
 
         // Create a unique note for this test to avoid conflicts
         var uniqueText = $"Debug test note {Guid.NewGuid()}";
@@ -215,15 +220,15 @@ public class HandlerIntegrationTests : IDisposable
         var notesBeforeDelete = await mediator.Send(new GetAllNotesQuery());
         var noteBeforeDelete = notesBeforeDelete.FirstOrDefault(n => n.Id == savedNote.Id);
         
-        // Debug 2: Verify file exists
-        var fileExistsBeforeDelete = await fileDataService.NoteExistsAsync(savedNote.Filename);
+        // Debug 2: Verify note exists in database
+        var noteExistsBeforeDelete = await noteRepository.GetByIdAsync(savedNote.Id, CancellationToken.None);
         
         // Delete the note
         var deleteCommand = new DeleteNoteCommand(savedNote);
         var deleteResult = await mediator.Send(deleteCommand);
         
-        // Debug 3: Check if file was actually deleted
-        var fileExistsAfterDelete = await fileDataService.NoteExistsAsync(savedNote.Filename);
+        // Debug 3: Check if note was actually deleted from database
+        var noteExistsAfterDelete = await noteRepository.GetByIdAsync(savedNote.Id, CancellationToken.None);
         
         // Debug 4: Check repository state after delete
         var notesAfterDelete = await mediator.Send(new GetAllNotesQuery());
@@ -232,13 +237,13 @@ public class HandlerIntegrationTests : IDisposable
         // Assert with detailed debug information
         Assert.NotNull(savedNote);
         Assert.NotNull(noteBeforeDelete);
-        Assert.True(fileExistsBeforeDelete, $"File should exist before delete: {savedNote.Filename}");
+        Assert.NotNull(noteExistsBeforeDelete);
         Assert.True(deleteResult, "Delete operation should return true");
         
-        // Check file deletion separately
-        if (fileExistsAfterDelete)
+        // Check database deletion separately
+        if (noteExistsAfterDelete != null)
         {
-            Assert.Fail($"File still exists after delete: {savedNote.Filename}");
+            Assert.Fail($"Note still exists in database after delete: {savedNote.Id}");
         }
         
         // Check repository state separately

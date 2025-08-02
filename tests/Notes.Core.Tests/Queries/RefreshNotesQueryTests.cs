@@ -13,7 +13,7 @@ public class RefreshNotesQueryTests
 
         // Assert
         Assert.NotNull(query);
-        Assert.IsAssignableFrom<IRequest>(query);
+        Assert.IsAssignableFrom<IRequest<IEnumerable<Note>>>(query);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class RefreshNotesQueryTests
         var query = new RefreshNotesQuery();
 
         // Assert
-        Assert.True(query is IRequest);
+        Assert.True(query is IRequest<IEnumerable<Note>>);
     }
 
     [Fact]

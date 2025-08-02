@@ -3,16 +3,13 @@ namespace Notes.Core.Handlers;
 public class SaveNoteHandler : IRequestHandler<SaveNoteCommand, Note>
 {
     private readonly IRepository<Note> _noteRepository;
-    private readonly IFileDataService _fileDataService;
     private readonly ILogger<SaveNoteHandler> _logger;
 
     public SaveNoteHandler(
         IRepository<Note> noteRepository,
-        IFileDataService fileDataService,
         ILogger<SaveNoteHandler> logger)
     {
         _noteRepository = noteRepository;
-        _fileDataService = fileDataService;
         _logger = logger;
     }
 
@@ -22,21 +19,23 @@ public class SaveNoteHandler : IRequestHandler<SaveNoteCommand, Note>
         {
             var note = command.Note;
 
-            if (!string.IsNullOrEmpty(note.Filename) && await _fileDataService.NoteExistsAsync(note.Filename))
+            // Check if this is an update (note has an ID and exists in database) or a new note
+            if (!string.IsNullOrEmpty(note.Id))
             {
-                var result = await _noteRepository.UpdateAsync(note);
-                return result;
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(note.Filename))
+                var existingNote = await _noteRepository.GetByIdAsync(note.Id, cancellationToken);
+                if (existingNote != null)
                 {
-                    note.Filename = _fileDataService.GenerateFilename();
+                    // Update existing note
+                    var result = await _noteRepository.UpdateAsync(note, cancellationToken);
+                    _logger.LogInformation("Updated note with ID: {Id}", note.Id);
+                    return result;
                 }
-                
-                var result = await _noteRepository.AddAsync(note);
-                return result;
             }
+            
+            // Create new note
+            var savedNote = await _noteRepository.AddAsync(note, cancellationToken);
+            _logger.LogInformation("Created new note with ID: {Id}", savedNote.Id);
+            return savedNote;
         }
         catch (Exception ex)
         {

@@ -1,4 +1,6 @@
-﻿namespace Notes;
+﻿using Notes.Core.Services.Data;
+
+namespace Notes;
 
 public static class MauiProgram
 {
@@ -33,6 +35,25 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
-		return builder.Build();
+		var app = builder.Build();
+		
+		// Initialize database and run migration
+		Task.Run(async () =>
+		{
+			using var scope = app.Services.CreateScope();
+			
+			// Initialize database first
+			var dbInitService = scope.ServiceProvider.GetRequiredService<IDatabaseInitializationService>();
+			await dbInitService.InitializeDatabaseAsync();
+			
+			// Run migration from files to database
+			var migrationService = scope.ServiceProvider.GetRequiredService<IDatabaseMigrationService>();
+			var migratedCount = await migrationService.MigrateFromFilesToDatabaseAsync();
+			
+			// Log migration result (only visible in debug output)
+			Console.WriteLine($"Database migration completed. Migrated {migratedCount} notes from files to database.");
+		});
+
+		return app;
 	}
 }

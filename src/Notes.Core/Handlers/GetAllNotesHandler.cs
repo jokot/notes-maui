@@ -13,15 +13,18 @@ public class GetAllNotesHandler : IRequestHandler<GetAllNotesQuery, IEnumerable<
         _logger = logger;
     }
 
-    public async Task<IEnumerable<Note>> Handle(GetAllNotesQuery query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Note>> Handle(GetAllNotesQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            return await _noteRepository.GetAllAsync();
+            _logger.LogDebug("Getting all notes from repository");
+            var notes = await _noteRepository.GetAllAsync(cancellationToken);
+            _logger.LogInformation("Retrieved {Count} notes", notes.Count());
+            return notes;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve notes");
+            _logger.LogError(ex, "Failed to get notes");
             throw;
         }
     }

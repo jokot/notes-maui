@@ -57,6 +57,7 @@ public class FileDataService : IFileDataService
                         // Fall back to plain text format
                         note = new Note
                         {
+                            Id = Guid.NewGuid().ToString(), // Always generate an ID
                             Filename = file,
                             Text = content,
                             UpdatedAt = fileTime
@@ -84,6 +85,11 @@ public class FileDataService : IFileDataService
     {
         try
         {
+            // Ensure we have a full path for the filename
+            var fullPath = Path.IsPathRooted(note.Filename) 
+                ? note.Filename 
+                : Path.Combine(_dataPath, note.Filename);
+
             // Create minimal JSON with only essential properties
             var minimalData = new
             {
@@ -94,7 +100,7 @@ public class FileDataService : IFileDataService
             
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonContent = JsonSerializer.Serialize(minimalData, options);
-            await File.WriteAllTextAsync(note.Filename, jsonContent);
+            await File.WriteAllTextAsync(fullPath, jsonContent);
         }
         catch (Exception ex)
         {
@@ -120,9 +126,9 @@ public class FileDataService : IFileDataService
         }
     }
 
-    public async Task<bool> NoteExistsAsync(string filename)
+    public Task<bool> NoteExistsAsync(string filename)
     {
-        return File.Exists(filename);
+        return Task.FromResult(File.Exists(filename));
     }
 
     public string GenerateFilename()

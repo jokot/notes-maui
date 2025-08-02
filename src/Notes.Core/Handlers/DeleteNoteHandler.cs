@@ -13,22 +13,33 @@ public class DeleteNoteHandler : IRequestHandler<DeleteNoteCommand, bool>
         _logger = logger;
     }
 
-    public async Task<bool> Handle(DeleteNoteCommand command, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            if (command.Note == null)
+            if (request.Note == null)
             {
-                _logger.LogWarning("Delete command received with null note");
+                _logger.LogWarning("Cannot delete note: Note is null");
                 return false;
             }
 
-            await _noteRepository.DeleteAsync(command.Note.Id);
-            return true;
+            _logger.LogDebug("Deleting note with ID: {Id}", request.Note.Id);
+            var result = await _noteRepository.DeleteAsync(request.Note.Id, cancellationToken);
+            
+            if (result)
+            {
+                _logger.LogInformation("Successfully deleted note with ID: {Id}", request.Note.Id);
+            }
+            else
+            {
+                _logger.LogWarning("Note with ID: {Id} was not found for deletion", request.Note.Id);
+            }
+            
+            return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to delete note: {FileName}", command.Note?.Filename ?? "unknown");
+            _logger.LogError(ex, "Failed to delete note with ID: {Id}", request.Note?.Id ?? "null");
             throw;
         }
     }

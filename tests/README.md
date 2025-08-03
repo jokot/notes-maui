@@ -25,18 +25,18 @@ Our testing strategy follows the **Test Pyramid** approach, ensuring fast feedba
 - **Categories**: `Unit`, `Fast`, `Commands`, `Handlers`
 
 **Key Test Categories:**
-- Command validation and behavior
-- Handler logic and error handling
+- CQRS command and query validation
+- MediatR handler logic and error handling
 - Model integrity and business rules
-- Service extension registration
+- Service extension registration and dependency injection
 
 ### 2. **Notes.Integration.Tests** - Integration Tests
-- **Purpose**: Test component interactions and data flow
-- **Framework**: xUnit with test containers/in-memory databases
-- **Target**: Service integrations and data persistence
+- **Purpose**: Test component interactions, data flow, and Entity Framework operations
+- **Framework**: xUnit with real SQLite databases and dependency injection
+- **Target**: Service integrations, database operations, and data persistence
 - **Execution Time**: 1-3 minutes
-- **Coverage**: Service interactions, data access, API integrations
-- **Categories**: `Integration`, `Slow`, `Services`, `Data`
+- **Coverage**: Database initialization, migrations, repository patterns, end-to-end data flow
+- **Categories**: `Integration`, `Slow`, `Services`, `Data`, `Database`
 
 ### 3. **Notes.UI.Tests** - UI Automation Tests
 - **Purpose**: End-to-end testing of user workflows and UI interactions
@@ -50,7 +50,9 @@ Our testing strategy follows the **Test Pyramid** approach, ensuring fast feedba
 
 ### Prerequisites
 - .NET 9.0 SDK
+- For Integration Tests: SQLite support (included with .NET)
 - For UI Tests: iOS Simulator or Android Emulator
+- Visual Studio 2022 (17.8+) or Visual Studio Code with C# extension
 
 ### Quick Commands
 
@@ -76,6 +78,7 @@ dotnet test --filter Category=Slow      # Integration tests
 dotnet test --filter Category=Unit      # All unit tests
 dotnet test --filter Category=Integration # All integration tests
 dotnet test --filter Category=UI        # All UI tests
+dotnet test --filter Category=Database  # Database-specific tests
 ```
 
 ### Test Categories Overview
@@ -93,9 +96,10 @@ We use a comprehensive categorization system across all test projects for better
 
 #### **Component-Specific Categories**
 - `Commands` - Command validation tests
-- `Handlers` - Handler logic tests
+- `Handlers` - MediatR handler logic tests
 - `Services` - Service integration tests
 - `Data` - Data access and persistence tests
+- `Database` - Entity Framework and database operation tests
 
 #### **UI-Specific Categories**
 - `Smoke` - Critical path validation
@@ -199,7 +203,12 @@ public async Task TestName_Should_ExpectedBehavior()
 // Integration test example  
 [Trait("Category", "Integration")]
 [Trait("Category", "Slow")]
-[Trait("Category", "Services")]
+[Trait("Category", "Database")]
+
+// MediatR handler test example
+[Trait("Category", "Unit")]
+[Trait("Category", "Fast")]
+[Trait("Category", "Handlers")]
 
 // UI test example
 [Trait("Category", "UI")]
@@ -265,9 +274,10 @@ When adding tests:
 
 ### Test Category Migration
 **Current Status**: All test projects have been fully categorized with comprehensive trait-based organization:
-- **Unit tests** (23): `Unit`, `Fast`, plus component-specific categories (`Commands`, `Handlers`)
-- **Integration tests** (9): `Integration`, `Slow`, plus service-specific categories (`Services`, `Data`)  
+- **Unit tests** (23): `Unit`, `Fast`, plus component-specific categories (`Commands`, `Handlers`, `Queries`)
+- **Integration tests** (9): `Integration`, `Slow`, plus service-specific categories (`Services`, `Data`, `Database`)  
 - **UI tests** (17): `UI`, plus specific categories (`Smoke`, `Regression`, `Diagnostic`)
+- **Architecture**: Tests cover MediatR CQRS patterns, Entity Framework operations, and cross-platform UI workflows
 - This enables sophisticated CI/CD pipeline organization and selective test execution
 
 ## 📝 Additional Resources
@@ -278,5 +288,5 @@ When adding tests:
 
 ---
 
-*Last updated: July 27, 2025*
-*Test suite optimized for developer productivity and fast feedback cycles* ⚡
+*Last updated: August 2025*
+*Test suite optimized for developer productivity and fast feedback cycles with Entity Framework and MediatR integration* ⚡

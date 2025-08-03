@@ -14,10 +14,12 @@ Notes/
 │   ├── Notes.Core/                # Business logic and core functionality
 │   │   ├── Commands/              # CQRS command definitions
 │   │   ├── Constants/             # Application constants
+│   │   ├── Data/                  # Entity Framework DbContext and data layer
 │   │   ├── Extensions/            # Service collection extensions
-│   │   ├── Handlers/              # Command handlers
+│   │   ├── Handlers/              # MediatR command and query handlers
 │   │   ├── Interfaces/            # Contracts and abstractions
 │   │   ├── Models/                # Data models and entities
+│   │   ├── Queries/               # CQRS query definitions
 │   │   └── Services/              # Business services and data access
 │   └── Notes.Maui/                # MAUI application (UI layer)
 │       ├── App.xaml               # Application entry point
@@ -32,7 +34,6 @@ Notes/
 │   ├── Notes.Integration.Tests/   # Integration tests for services
 │   ├── Notes.UI.Tests/            # UI automation tests with Appium
 │   └── README.md                  # Testing documentation
-├── .vscode/                       # VS Code configuration
 ├── README.md                      # This file
 ├── LICENSE                        # MIT license
 └── Notes.sln                      # Solution file
@@ -54,19 +55,31 @@ Notes/
 - **Async/Await**: Proper asynchronous programming throughout
 
 ### Cross-Platform Support
-- **Android**: API 35.0 (Android 15)
-- **iOS**: iOS 18.5
-- **macOS**: macCatalyst 18.5
+- **Android**: API 21+ (Android 5.0+)
+- **iOS**: iOS 15.0+
+- **macOS**: macCatalyst 15.0+
+- **Windows**: Windows 10 version 1903 (build 10.0.17763.0)+
 - **Responsive UI**: Adaptive layouts for different screen sizes
 
 ## 🛠️ Technical Stack
 
+### Core Framework
 - **.NET 9**: Latest framework version
 - **.NET MAUI**: Cross-platform UI framework
 - **CommunityToolkit.Mvvm**: MVVM framework with source generators
+
+### Data & Persistence
+- **Entity Framework Core**: Object-relational mapping (ORM)
+- **SQLite**: Lightweight, embedded database
 - **System.Text.Json**: High-performance JSON serialization
+
+### Architecture & Patterns
 - **Clean Architecture**: Separation of business logic and UI concerns
-- **CQRS Pattern**: Command handlers for business operations
+- **CQRS Pattern**: Command Query Responsibility Segregation with MediatR
+- **MediatR**: Mediator pattern implementation for CQRS
+- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
+
+### Testing
 - **xUnit**: Unit testing framework with comprehensive test coverage
 - **FluentAssertions**: Expressive test assertions
 - **Moq**: Mocking framework for unit tests
@@ -75,11 +88,12 @@ Notes/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Visual Studio 2022 (17.5+) or Visual Studio Code with C# extension
+- Visual Studio 2022 (17.8+) or Visual Studio Code with C# extension
 - .NET 9 SDK
 - Platform-specific SDKs:
-  - Android SDK (API 35)
+  - Android SDK (API 21+)
   - Xcode 15+ (for iOS/macOS development)
+  - Windows SDK 10.0.17763.0+ (for Windows development)
 
 ### Building the Application
 
@@ -109,6 +123,9 @@ Notes/
    
    # macOS
    dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-maccatalyst
+   
+   # Windows
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-windows10.0.19041.0
    ```
 
 ### Running Tests
@@ -145,27 +162,53 @@ dotnet test --verbosity normal
 
 ### Clean Architecture Implementation
 ```csharp
-// Command pattern with handlers
-public class SaveNoteCommand
+// CQRS Command pattern with MediatR
+public class SaveNoteCommand : IRequest
 {
     public Note Note { get; set; }
 }
 
 public class SaveNoteHandler : IRequestHandler<SaveNoteCommand>
 {
-    // Business logic separated from UI concerns
+    private readonly NotesDbContext _context;
+    
+    public SaveNoteHandler(NotesDbContext context)
+    {
+        _context = context;
+    }
+    
+    public async Task Handle(SaveNoteCommand request, CancellationToken cancellationToken)
+    {
+        // Business logic separated from UI concerns
+        // Entity Framework operations
+    }
 }
 ```
 
-### Smart Caching Logic
+### Data Access with Entity Framework
 ```csharp
-// Cache expires after 5 minutes of inactivity
-private readonly TimeSpan _cacheTimeout = TimeSpan.FromMinutes(5);
+// Entity Framework DbContext configuration
+public class NotesDbContext : DbContext
+{
+    public DbSet<Note> Notes { get; set; } = null!;
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Note>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Filename).IsRequired().HasMaxLength(255);
+            entity.HasIndex(e => e.Filename).IsUnique();
+            // Additional configurations...
+        });
+    }
+}
 
-// Automatic cache invalidation on modifications
+// Service layer with caching
 public async Task SaveNoteAsync(Note note)
 {
-    await _fileDataService.SaveNoteAsync(note);
+    await _context.Notes.AddAsync(note);
+    await _context.SaveChangesAsync();
     InvalidateCache(); // Immediate cache refresh
 }
 ```
@@ -219,18 +262,24 @@ This project demonstrates key concepts for enterprise mobile development:
 5. **Performance Optimization**: Smart caching, async programming, memory management
 6. **Modern .NET Patterns**: Dependency injection, MVVM, and latest C# features
 
-## 🔄 Smart Cache Implementation
+## 🔄 Data Architecture & Caching
 
-The `NoteService` implements intelligent caching to optimize performance:
+The application implements a layered data architecture with Entity Framework Core and intelligent caching:
 
-### Cache Features
+### Data Layer Features
+- **Entity Framework Core**: Object-relational mapping with SQLite
+- **Database Migrations**: Automatic schema management
+- **Indexed Queries**: Optimized database performance
+- **ACID Transactions**: Data consistency and integrity
+
+### Caching Strategy
 - **Timeout-based**: 5-minute cache expiration
 - **Event-driven**: Immediate invalidation on data changes
 - **Memory efficient**: Lazy loading with cleanup
 - **Thread-safe**: Concurrent access protection
 
 ### Performance Benefits
-- Reduced file system access
+- Reduced database queries
 - Faster note list loading
 - Improved user experience
 - Lower battery consumption

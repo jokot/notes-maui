@@ -6,8 +6,9 @@
              AutomationId="PageTitle"
              Title="{Binding Title}"
              x:DataType="viewmodels:NoteViewModel">
-    <VerticalStackLayout Spacing="10" Margin="5">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="5" RowSpacing="10">
         <Editor x:Name="TitleEditor"
+                Grid.Row="0"
                 AutomationId="NoteTitleEditor"
                 Placeholder="Enter title"
                 Text="{Binding Note.Title, FallbackValue='Untitled'}"
@@ -17,12 +18,12 @@
                 MaxLength="200" />
         
         <Editor x:Name="TextEditor"
+                Grid.Row="1"
                 AutomationId="NoteEditor"
                 Placeholder="Enter your note"
-                Text="{Binding Note.Text}"
-                HeightRequest="100" />
+                Text="{Binding Note.Text}" />
 
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="4">
             <Button Text="Save"
                     AutomationId="SaveButton"
                     Command="{Binding SaveNoteCommand}" />
@@ -32,5 +33,5 @@
                     AutomationId="DeleteButton"
                     Command="{Binding DeleteNoteCommand}" />
         </Grid>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>

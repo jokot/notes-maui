@@ -23,6 +23,10 @@ public class NotesDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50);
 
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+
             entity.Property(e => e.Filename)
                 .IsRequired()
                 .HasMaxLength(255);

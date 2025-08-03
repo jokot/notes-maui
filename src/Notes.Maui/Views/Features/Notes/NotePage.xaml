@@ -7,6 +7,15 @@
              Title="{Binding Title}"
              x:DataType="viewmodels:NoteViewModel">
     <VerticalStackLayout Spacing="10" Margin="5">
+        <Editor x:Name="TitleEditor"
+                AutomationId="NoteTitleEditor"
+                Placeholder="Enter title"
+                Text="{Binding Note.Title, FallbackValue='Untitled'}"
+                FontSize="18"
+                FontAttributes="Bold"
+                HeightRequest="40"
+                MaxLength="200" />
+        
         <Editor x:Name="TextEditor"
                 AutomationId="NoteEditor"
                 Placeholder="Enter your note"

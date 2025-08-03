@@ -13,7 +13,7 @@ public partial class NoteViewModel : BaseViewModel
     {
         Title = "Note";
         _mediator = mediator;
-        note = new Note();
+        note = new Note { Title = "Untitled" };
     }
 
     [ObservableProperty]
@@ -26,6 +26,16 @@ public partial class NoteViewModel : BaseViewModel
         {
             if (Note != null && !string.IsNullOrWhiteSpace(Note.Text))
             {
+                // Ensure note has a title
+                if (string.IsNullOrWhiteSpace(Note.Title))
+                {
+                    // Generate title from first line of text or provide default
+                    var firstLine = Note.Text.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                    Note.Title = !string.IsNullOrWhiteSpace(firstLine) && firstLine.Length <= 50 
+                        ? firstLine.Trim() 
+                        : firstLine?.Substring(0, Math.Min(50, firstLine.Length)).Trim() + "..." ?? "Untitled";
+                }
+
                 // Create command with the note object
                 var command = new SaveNoteCommand(Note);
 
@@ -64,4 +74,4 @@ public partial class NoteViewModel : BaseViewModel
             await NavigationService.GoBackAsync();
         }, nameof(DeleteNote));
     }
-} 
+}

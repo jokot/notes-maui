@@ -39,8 +39,8 @@ public class SaveNoteHandler : IRequestHandler<SaveNoteCommand, Note>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to save note: {Text}", command.Note.Text[..Math.Min(50, command.Note.Text.Length)]);
+            _logger.LogError(ex, "Failed to save note: {Title}", command.Note.Title ?? command.Note.Text[..Math.Min(50, command.Note.Text.Length)]);
             throw;
         }
     }
-} 
+}

@@ -58,12 +58,19 @@
                                     CommandParameter="{Binding .}"/>
                             </StackLayout.GestureRecognizers>
 
+                            <Label Text="{Binding Title}"
+                                   AutomationId="NoteTitle"
+                                   FontSize="18"
+                                   FontAttributes="Bold"/>
                             <Label Text="{Binding Text}"
                                    AutomationId="NoteText"
-                                   FontSize="22"/>
+                                   FontSize="14"
+                                   TextColor="Gray"
+                                   MaxLines="2"
+                                   LineBreakMode="TailTruncation"/>
                             <Label Text="{Binding UpdatedAt}"
                                    AutomationId="NoteDate"
-                                   FontSize="14"
+                                   FontSize="12"
                                    TextColor="Silver"/>
                         </StackLayout>
                     </DataTemplate>

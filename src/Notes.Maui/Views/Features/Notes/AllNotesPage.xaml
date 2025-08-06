@@ -35,10 +35,14 @@
                         <Label Text="No notes available"
                                FontSize="20"
                                HorizontalOptions="Center"/>
-                        <Button Text="Add Note"
+                        <Button Text="+ Add Note"
                                 AutomationId="EmptyStateAddButton"
                                 Command="{Binding AddNoteCommand}"
-                                HorizontalOptions="Center"/>
+                                HorizontalOptions="Center"
+                                BackgroundColor="Transparent"
+                                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                BorderWidth="0"
+                                FontSize="16"/>
                     </StackLayout>
                 </CollectionView.EmptyView>
 

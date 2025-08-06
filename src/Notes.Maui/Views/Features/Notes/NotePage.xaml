@@ -6,7 +6,14 @@
              AutomationId="PageTitle"
              Title="{Binding Title}"
              x:DataType="viewmodels:NoteViewModel">
-    <Grid RowDefinitions="Auto,*,Auto" Margin="5" RowSpacing="10">
+    
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Save"
+                     AutomationId="SaveButton"
+                     Command="{Binding SaveNoteCommand}"
+                     IconImageSource="{FontImage Glyph=✓, FontFamily=Default, Color=Black, Size=20}" />
+    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="Auto,*" Margin="5" RowSpacing="10">
         <Editor x:Name="TitleEditor"
                 Grid.Row="0"
                 AutomationId="NoteTitleEditor"
@@ -22,16 +29,5 @@
                 AutomationId="NoteEditor"
                 Placeholder="Enter your note"
                 Text="{Binding Note.Text}" />
-
-        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="4">
-            <Button Text="Save"
-                    AutomationId="SaveButton"
-                    Command="{Binding SaveNoteCommand}" />
-
-            <Button Grid.Column="1"
-                    Text="Delete"
-                    AutomationId="DeleteButton"
-                    Command="{Binding DeleteNoteCommand}" />
-        </Grid>
     </Grid>
 </ContentPage>

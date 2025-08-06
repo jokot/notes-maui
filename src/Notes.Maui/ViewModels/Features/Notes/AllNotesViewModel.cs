@@ -65,7 +65,8 @@ public partial class AllNotesViewModel : BaseViewModel
 
         await NavigationService.NavigateToAsync(AppConstants.Navigation.NotePage, new Dictionary<string, object>
         {
-            { nameof(Note), note }
+            { nameof(Note), note },
+            { "IsEdit", true }
         });
     }
-} 
+}

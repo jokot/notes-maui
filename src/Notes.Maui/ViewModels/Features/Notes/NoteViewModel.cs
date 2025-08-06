@@ -1,9 +1,12 @@
 namespace Notes.Maui.ViewModels.Features.Notes;
 
 [QueryProperty(nameof(Note), nameof(Note))]
+[QueryProperty(nameof(IsEdit), "IsEdit")]
 public partial class NoteViewModel : BaseViewModel
 {
     private readonly IMediator _mediator;
+
+    private readonly string _initialNoteId;
 
     public NoteViewModel(
         IMediator mediator,
@@ -14,10 +17,28 @@ public partial class NoteViewModel : BaseViewModel
         Title = "Note";
         _mediator = mediator;
         note = new Note { Title = "Untitled" };
+        _initialNoteId = note.Id; // Store the ID of the initial note
     }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
     Note? note;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
+    bool isEdit;
+
+    public bool IsEditMode 
+    {
+        get 
+        {
+            // Show delete button only when:
+            // 1. IsEdit is true (we're in edit mode)
+            // 2. Note is not null
+            // 3. The note is not the initial note we created in constructor (it's a real note from the database)
+            return IsEdit && Note != null && Note.Id != _initialNoteId;
+        }
+    }
 
     [RelayCommand]
     async Task SaveNote()
@@ -48,6 +69,8 @@ public partial class NoteViewModel : BaseViewModel
             await NavigationService.GoBackAsync();
         }, nameof(SaveNote));
     }
+
+
 
     [RelayCommand]
     async Task DeleteNote()

@@ -15,18 +15,26 @@
                      Command="{Binding AddNoteCommand}"
                      IconImageSource="{FontImage Glyph='+', Color=Black, Size=22}"/>
     </ContentPage.ToolbarItems>
-    <RefreshView
-        AutomationId="RefreshButton"
-        Command="{Binding RefreshNotesCommand}"
-        IsRefreshing="{Binding IsRefreshing}">
-        <Grid>
-            <!-- Display notes in a list -->
-            <CollectionView
-                x:Name="notesCollection"
-                AutomationId="NotesCollection"
-                ItemsSource="{Binding Notes}"
-                Margin="20"
-                SelectionMode="None">
+    <StackLayout>
+        <SearchBar Placeholder="Search notes..."
+                   Text="{Binding SearchText}"
+                   BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"
+                   Margin="10,5" />
+        
+        <RefreshView
+            AutomationId="RefreshButton"
+            Command="{Binding RefreshNotesCommand}"
+            IsRefreshing="{Binding IsRefreshing}">
+            <Grid>
+                <!-- Display notes in a list -->
+                <CollectionView
+                    x:Name="notesCollection"
+                    AutomationId="NotesCollection"
+                    ItemsSource="{Binding FilteredNotes}"
+                    Margin="20"
+                    SelectionMode="None">
 
                 <CollectionView.EmptyView>
                     <StackLayout VerticalOptions="Center"
@@ -87,6 +95,7 @@
                 Color="{StaticResource Primary}"
                 VerticalOptions="Center"
                 HorizontalOptions="Center"/>
-        </Grid>
-    </RefreshView>
+            </Grid>
+        </RefreshView>
+    </StackLayout>
 </ContentPage>

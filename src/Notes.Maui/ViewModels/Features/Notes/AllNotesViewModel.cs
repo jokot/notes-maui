@@ -4,7 +4,12 @@ public partial class AllNotesViewModel : BaseViewModel
 {
     [ObservableProperty]
     bool isRefreshing;
+    
+    [ObservableProperty]
+    string searchText = string.Empty;
+    
     public ObservableCollection<Note> Notes { get; } = [];
+    public ObservableCollection<Note> FilteredNotes { get; } = [];
 
     private readonly IMediator _mediator;
 
@@ -17,6 +22,32 @@ public partial class AllNotesViewModel : BaseViewModel
         Title = "Your Notes";
         _mediator = mediator;
     }
+    
+    partial void OnSearchTextChanged(string value)
+    {
+        FilterNotes();
+    }
+    
+    private void FilterNotes()
+    {
+        FilteredNotes.Clear();
+        
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            foreach (var note in Notes)
+                FilteredNotes.Add(note);
+        }
+        else
+        {
+            var searchTerm = SearchText.ToLowerInvariant();
+            var filteredNotes = Notes.Where(note => 
+                note.Title.ToLowerInvariant().Contains(searchTerm) ||
+                note.Text.ToLowerInvariant().Contains(searchTerm));
+                
+            foreach (var note in filteredNotes)
+                FilteredNotes.Add(note);
+        }
+    }
 
     public async Task GetNotesAsync()
     {
@@ -28,6 +59,8 @@ public partial class AllNotesViewModel : BaseViewModel
             Notes.Clear();
             foreach (var note in notes)
                 Notes.Add(note);
+                
+            FilterNotes();
         }, nameof(GetNotesAsync));
     }
 
@@ -47,6 +80,8 @@ public partial class AllNotesViewModel : BaseViewModel
             Notes.Clear();
             foreach (var note in notes)
                 Notes.Add(note);
+                
+            FilterNotes();
 
             IsRefreshing = false;
         }, nameof(RefreshNotes));

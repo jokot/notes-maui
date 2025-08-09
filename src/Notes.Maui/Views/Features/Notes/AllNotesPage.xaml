@@ -87,7 +87,7 @@
                             </SwipeView.RightItems>
                             
                             <!-- Main content -->
-                            <StackLayout AutomationId="NoteItem" Padding="10">
+                            <StackLayout AutomationId="NoteItem" Padding="10" BackgroundColor="{Binding BackgroundColor}">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"

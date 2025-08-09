@@ -112,4 +112,14 @@ public partial class NoteViewModel : BaseViewModel
             await NavigationService.GoBackAsync();
         }, nameof(DeleteNote));
     }
+
+    [RelayCommand]
+    void SetBackgroundColor(string color)
+    {
+        if (Note != null)
+        {
+            Note.BackgroundColor = color;
+            OnPropertyChanged(nameof(Note));
+        }
+    }
 }

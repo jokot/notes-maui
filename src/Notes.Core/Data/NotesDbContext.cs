@@ -37,6 +37,15 @@ public class NotesDbContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .IsRequired();
 
+            entity.Property(e => e.IsPinned)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            entity.Property(e => e.BackgroundColor)
+                .IsRequired()
+                .HasMaxLength(7)
+                .HasDefaultValue("#FFFFFF");
+
             // Indexes
             entity.HasIndex(e => e.Filename)
                 .IsUnique()

@@ -63,28 +63,68 @@
                 <!-- Define the appearance of each item in the list -->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Note">
-                        <StackLayout AutomationId="NoteItem">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
-                                    CommandParameter="{Binding .}"/>
-                            </StackLayout.GestureRecognizers>
+                        <SwipeView>
+                            <!-- Left swipe actions -->
+                            <SwipeView.LeftItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}"
+                                               BackgroundColor="#64B5F6"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
+                                               CommandParameter="{Binding .}"
+                                               IconImageSource="{FontImage Glyph='📌', Color=White, Size=20}" />
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+                            
+                            <!-- Right swipe actions -->
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete"
+                                               BackgroundColor="#EF5350"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
+                                               CommandParameter="{Binding .}"
+                                               IconImageSource="{FontImage Glyph='🗑️', Color=White, Size=20}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            
+                            <!-- Main content -->
+                            <StackLayout AutomationId="NoteItem" Padding="10">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </StackLayout.GestureRecognizers>
 
-                            <Label Text="{Binding Title}"
-                                   AutomationId="NoteTitle"
-                                   FontSize="18"
-                                   FontAttributes="Bold"/>
-                            <Label Text="{Binding Text}"
-                                   AutomationId="NoteText"
-                                   FontSize="14"
-                                   TextColor="Gray"
-                                   MaxLines="2"
-                                   LineBreakMode="TailTruncation"/>
-                            <Label Text="{Binding UpdatedAt}"
-                                   AutomationId="NoteDate"
-                                   FontSize="12"
-                                   TextColor="Silver"/>
-                        </StackLayout>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Label Text="{Binding Title}"
+                                           AutomationId="NoteTitle"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           Grid.Column="0" />
+                                    
+                                    <Label Text="📌"
+                                           FontSize="16"
+                                           IsVisible="{Binding IsPinned}"
+                                           Grid.Column="1"
+                                           VerticalOptions="Start" />
+                                </Grid>
+                                
+                                <Label Text="{Binding Text}"
+                                       AutomationId="NoteText"
+                                       FontSize="14"
+                                       TextColor="Gray"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding UpdatedAt}"
+                                       AutomationId="NoteDate"
+                                       FontSize="12"
+                                       TextColor="Silver"/>
+                            </StackLayout>
+                        </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

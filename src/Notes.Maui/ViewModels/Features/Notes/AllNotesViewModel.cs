@@ -32,21 +32,27 @@ public partial class AllNotesViewModel : BaseViewModel
     {
         FilteredNotes.Clear();
         
+        IEnumerable<Note> notesToFilter;
+        
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            foreach (var note in Notes)
-                FilteredNotes.Add(note);
+            notesToFilter = Notes;
         }
         else
         {
             var searchTerm = SearchText.ToLowerInvariant();
-            var filteredNotes = Notes.Where(note => 
+            notesToFilter = Notes.Where(note => 
                 note.Title.ToLowerInvariant().Contains(searchTerm) ||
                 note.Text.ToLowerInvariant().Contains(searchTerm));
-                
-            foreach (var note in filteredNotes)
-                FilteredNotes.Add(note);
         }
+        
+        // Sort notes: pinned notes first, then by UpdatedAt descending
+        var sortedNotes = notesToFilter
+            .OrderByDescending(note => note.IsPinned)
+            .ThenByDescending(note => note.UpdatedAt);
+            
+        foreach (var note in sortedNotes)
+            FilteredNotes.Add(note);
     }
 
     public async Task GetNotesAsync()
@@ -103,5 +109,49 @@ public partial class AllNotesViewModel : BaseViewModel
             { nameof(Note), note },
             { "IsEdit", true }
         });
+    }
+    
+    [RelayCommand]
+    async Task DeleteNote(Note note)
+    {
+        if (note == null) return;
+        
+        await ExecuteAsync(async () =>
+        {
+            var command = new DeleteNoteCommand(note);
+            var success = await _mediator.Send(command);
+            
+            if (success)
+            {
+                Notes.Remove(note);
+                FilteredNotes.Remove(note);
+            }
+        }, nameof(DeleteNote));
+    }
+    
+    [RelayCommand]
+    async Task TogglePin(Note note)
+    {
+        if (note == null) return;
+        
+        await ExecuteAsync(async () =>
+        {
+            note.IsPinned = !note.IsPinned;
+            note.UpdatedAt = DateTime.Now;
+            
+            var command = new SaveNoteCommand(note);
+            var updatedNote = await _mediator.Send(command);
+            
+            // Update the note in the Notes collection
+            var existingNote = Notes.FirstOrDefault(n => n.Id == updatedNote.Id);
+            if (existingNote != null)
+            {
+                var index = Notes.IndexOf(existingNote);
+                Notes[index] = updatedNote;
+            }
+            
+            // Re-filter to update the UI with new sorting
+            FilterNotes();
+        }, nameof(TogglePin));
     }
 }

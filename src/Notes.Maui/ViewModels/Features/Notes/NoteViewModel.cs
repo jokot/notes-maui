@@ -45,16 +45,31 @@ public partial class NoteViewModel : BaseViewModel
     {
         await ExecuteAsync(async () =>
         {
-            if (Note != null && !string.IsNullOrWhiteSpace(Note.Text))
+            if (Note != null)
             {
+                // Ensure note has some content - either title or text
+                if (string.IsNullOrWhiteSpace(Note.Text) && string.IsNullOrWhiteSpace(Note.Title))
+                {
+                    // If both are empty, set a default title
+                    Note.Title = "Untitled";
+                    Note.Text = "";
+                }
+                
                 // Ensure note has a title
                 if (string.IsNullOrWhiteSpace(Note.Title))
                 {
-                    // Generate title from first line of text or provide default
-                    var firstLine = Note.Text.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-                    Note.Title = !string.IsNullOrWhiteSpace(firstLine) && firstLine.Length <= 50 
-                        ? firstLine.Trim() 
-                        : firstLine?.Substring(0, Math.Min(50, firstLine.Length)).Trim() + "..." ?? "Untitled";
+                    if (!string.IsNullOrWhiteSpace(Note.Text))
+                    {
+                        // Generate title from first line of text or provide default
+                        var firstLine = Note.Text.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                        Note.Title = !string.IsNullOrWhiteSpace(firstLine) && firstLine.Length <= 50 
+                            ? firstLine.Trim() 
+                            : firstLine?.Substring(0, Math.Min(50, firstLine.Length)).Trim() + "..." ?? "Untitled";
+                    }
+                    else
+                    {
+                        Note.Title = "Untitled";
+                    }
                 }
 
                 // Create command with the note object

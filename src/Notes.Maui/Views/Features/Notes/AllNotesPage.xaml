@@ -67,32 +67,42 @@
                             <!-- Left swipe actions -->
                             <SwipeView.LeftItems>
                                 <SwipeItems>
-                                    <SwipeItem Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}"
-                                               BackgroundColor="#64B5F6"
-                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
-                                               CommandParameter="{Binding .}"
-                                               IconImageSource="{FontImage Glyph='📌', Color=White, Size=20}" />
+                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
+                                                   CommandParameter="{Binding .}">
+                                        <Frame BackgroundColor="#81C784" CornerRadius="15" BorderColor="Gray" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
+                                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
+                                                <Label Text="📌" FontSize="20" TextColor="White" HorizontalOptions="Center" />
+                                                <Label Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}" 
+                                                       FontSize="10" TextColor="White" HorizontalOptions="Center" />
+                                            </StackLayout>
+                                        </Frame>
+                                    </SwipeItemView>
                                 </SwipeItems>
                             </SwipeView.LeftItems>
                             
                             <!-- Right swipe actions -->
                             <SwipeView.RightItems>
                                 <SwipeItems>
-                                    <SwipeItem Text="Delete"
-                                               BackgroundColor="#EF5350"
-                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
-                                               CommandParameter="{Binding .}"
-                                               IconImageSource="{FontImage Glyph='🗑️', Color=White, Size=20}" />
+                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
+                                                   CommandParameter="{Binding .}">
+                                        <Frame BackgroundColor="#EF5350" CornerRadius="15" BorderColor="Gray" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
+                                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
+                                                <Label Text="🗑️" FontSize="20" TextColor="White" HorizontalOptions="Center" />
+                                                <Label Text="Delete" FontSize="10" TextColor="White" HorizontalOptions="Center" />
+                                            </StackLayout>
+                                        </Frame>
+                                    </SwipeItemView>
                                 </SwipeItems>
                             </SwipeView.RightItems>
                             
                             <!-- Main content -->
-                            <StackLayout AutomationId="NoteItem" Padding="10" BackgroundColor="{Binding BackgroundColor}">
-                                <StackLayout.GestureRecognizers>
+                            <Frame AutomationId="NoteItem" Padding="10" Margin="5" BackgroundColor="{Binding BackgroundColor}" CornerRadius="15" BorderColor="Gray" HasShadow="False">
+                                <Frame.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
                                         CommandParameter="{Binding .}"/>
-                                </StackLayout.GestureRecognizers>
+                                </Frame.GestureRecognizers>
+                                <StackLayout>
 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -123,7 +133,8 @@
                                        AutomationId="NoteDate"
                                        FontSize="12"
                                        TextColor="Silver"/>
-                            </StackLayout>
+                                </StackLayout>
+                            </Frame>
                         </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

@@ -12,8 +12,11 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Save"
                      AutomationId="SaveButton"
-                     Command="{Binding SaveNoteCommand}"
-                     IconImageSource="{FontImage Glyph=✓, FontFamily=Default, Color=Black, Size=20}" />
+                     Command="{Binding SaveNoteCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="✓" FontFamily="Default" Size="20" Color="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
     </ContentPage.ToolbarItems>
     <Grid RowDefinitions="Auto,*,Auto" Margin="5" RowSpacing="10">
         <Frame Grid.Row="0" CornerRadius="15" BorderColor="Gray" HasShadow="False" Padding="10" BackgroundColor="{Binding Note.BackgroundColor}">
@@ -25,7 +28,9 @@
                     FontAttributes="Bold"
                     HeightRequest="40"
                     MaxLength="200"
-                    BackgroundColor="Transparent" />
+                    BackgroundColor="Transparent"
+                    TextColor="Black"
+                    PlaceholderColor="{StaticResource Gray600}" />
         </Frame>
         
         <Frame Grid.Row="1" CornerRadius="15" BorderColor="Gray" HasShadow="False" Padding="10" BackgroundColor="{Binding Note.BackgroundColor}">
@@ -33,7 +38,9 @@
                     AutomationId="NoteEditor"
                     Placeholder="Enter your note"
                     Text="{Binding Note.Text}"
-                    BackgroundColor="Transparent" />
+                    BackgroundColor="Transparent"
+                    TextColor="Black"
+                    PlaceholderColor="{StaticResource Gray600}" />
         </Frame>
         
         <!-- Color Picker Section -->

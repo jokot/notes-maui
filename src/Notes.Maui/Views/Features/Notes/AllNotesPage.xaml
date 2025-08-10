@@ -12,8 +12,11 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Add"
                      AutomationId="AddNoteButton"
-                     Command="{Binding AddNoteCommand}"
-                     IconImageSource="{FontImage Glyph='+', Color=Black, Size=22}"/>
+                     Command="{Binding AddNoteCommand}">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="+" Size="22" Color="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
     </ContentPage.ToolbarItems>
     <StackLayout>
         <SearchBar Placeholder="Search notes..."
@@ -114,7 +117,8 @@
                                            AutomationId="NoteTitle"
                                            FontSize="18"
                                            FontAttributes="Bold"
-                                           Grid.Column="0" />
+                                            Grid.Column="0"
+                                            TextColor="Black" />
                                     
                                     <Label Text="📌"
                                            FontSize="16"
@@ -126,13 +130,13 @@
                                 <Label Text="{Binding Text}"
                                        AutomationId="NoteText"
                                        FontSize="14"
-                                       TextColor="Gray"
+                                        TextColor="Black"
                                         MaxLines="10"
                                        LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding UpdatedAt}"
                                        AutomationId="NoteDate"
                                        FontSize="12"
-                                       TextColor="Silver"/>
+                                        TextColor="Gray"/>
                                 </StackLayout>
                             </Frame>
                         </SwipeView>

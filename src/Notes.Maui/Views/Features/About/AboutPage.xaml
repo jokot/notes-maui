@@ -14,23 +14,27 @@
 
             <Label Text="{Binding Title}"
                    FontSize="32"
-                   HorizontalOptions="Center" />
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
             <Label Text="Welcome to Notes - your personal note-taking companion! This app demonstrates modern .NET MAUI development patterns and serves as a foundation for building enterprise-grade mobile applications."
                    FontSize="16"
                    HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center" />
+                   HorizontalTextAlignment="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
             <Label Text="Built with:"
                    FontSize="18"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   Margin="0,20,0,0" />
+                   Margin="0,20,0,0"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
             <Label Text="• .NET 9 &amp; .NET MAUI&#10;• MVVM with CommunityToolkit&#10;• Clean Architecture&#10;• Dependency Injection&#10;• Smart Caching System&#10;• Cross-Platform Support"
                    FontSize="14"
                    HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center" />
+                   HorizontalTextAlignment="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
             <Button Text="Learn more about .NET MAUI"
                     Command="{Binding OpenWebsiteCommand}"

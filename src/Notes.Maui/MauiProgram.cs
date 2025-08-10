@@ -1,4 +1,4 @@
-﻿using Notes.Core.Services.Data;
+using Notes.Core.Services.Data;
 
 namespace Notes;
 
@@ -24,10 +24,8 @@ public static class MauiProgram
 		// Register Views
 		builder.Services.AddTransient<AllNotesPage>();
 		builder.Services.AddTransient<NotePage>();
-		builder.Services.AddTransient<AboutPage>();
 		
 		// Register ViewModels
-		builder.Services.AddTransient<AboutViewModel>();
 		builder.Services.AddTransient<AllNotesViewModel>();
 		builder.Services.AddTransient<NoteViewModel>();
 

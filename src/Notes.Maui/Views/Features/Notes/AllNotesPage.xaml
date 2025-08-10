@@ -72,7 +72,7 @@
                                 <SwipeItems>
                                     <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
                                                    CommandParameter="{Binding .}">
-                                        <Frame BackgroundColor="#81C784" CornerRadius="15" BorderColor="Gray" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
+                                        <Frame BackgroundColor="#81C784" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
                                             <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
                                                 <Label Text="📌" FontSize="20" TextColor="White" HorizontalOptions="Center" />
                                                 <Label Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}" 
@@ -88,7 +88,7 @@
                                 <SwipeItems>
                                     <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
                                                    CommandParameter="{Binding .}">
-                                        <Frame BackgroundColor="#EF5350" CornerRadius="15" BorderColor="Gray" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
+                                        <Frame BackgroundColor="#EF5350" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
                                             <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
                                                 <Label Text="🗑️" FontSize="20" TextColor="White" HorizontalOptions="Center" />
                                                 <Label Text="Delete" FontSize="10" TextColor="White" HorizontalOptions="Center" />
@@ -99,7 +99,7 @@
                             </SwipeView.RightItems>
                             
                             <!-- Main content -->
-                            <Frame AutomationId="NoteItem" Padding="10" Margin="5" BackgroundColor="{Binding BackgroundColor}" CornerRadius="15" BorderColor="Gray" HasShadow="False">
+                            <Frame AutomationId="NoteItem" Padding="10" Margin="5" BackgroundColor="{Binding BackgroundColor}" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False">
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"

@@ -5,8 +5,10 @@
              x:Class="Notes.Maui.Views.Features.Notes.NotePage"
              AutomationId="PageTitle"
              Title="{Binding Title}"
-             x:DataType="viewmodels:NoteViewModel">
+             >
+
     
+
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Save"
                      AutomationId="SaveButton"
@@ -35,14 +37,130 @@
         </Frame>
         
         <!-- Color Picker Section -->
-        <StackLayout Grid.Row="2" Orientation="Horizontal" HorizontalOptions="Center" Spacing="10" Margin="0,10,0,0">
-            <Label Text="Background:" VerticalOptions="Center" FontSize="14" />
-            <Button BackgroundColor="#FFFFFF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFFF" />
-            <Button BackgroundColor="#FFE0E0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0E0" />
-            <Button BackgroundColor="#E0FFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0FFE0" />
-            <Button BackgroundColor="#E0E0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0E0FF" />
-            <Button BackgroundColor="#FFFFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFE0" />
-            <Button BackgroundColor="#FFE0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0FF" />
-        </StackLayout>
+        <ScrollView Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+            <HorizontalStackLayout Spacing="10" Padding="0,0,10,0">
+                <!-- White -->
+                <Button BackgroundColor="#FFFFFF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFFF">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFFFFF">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Light Gray -->
+                <Button BackgroundColor="#F7F7F7" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#F7F7F7">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#F7F7F7">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Off White -->
+                <Button BackgroundColor="#FAFAFA" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FAFAFA">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FAFAFA">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Reds/Pinks -->
+                <Button BackgroundColor="#FFE0E0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0E0">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFE0E0">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button BackgroundColor="#FFE6F2" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE6F2">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFE6F2">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Oranges -->
+                <Button BackgroundColor="#FFEAD6" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFEAD6">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFEAD6">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button BackgroundColor="#FFF4CC" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFF4CC">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFF4CC">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Yellows -->
+                <Button BackgroundColor="#FFFFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFE0">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#FFFFE0">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Greens -->
+                <Button BackgroundColor="#E0FFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0FFE0">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#E0FFE0">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button BackgroundColor="#D9FFF5" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#D9FFF5">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#D9FFF5">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Blues -->
+                <Button BackgroundColor="#E0F7FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0F7FF">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#E0F7FF">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button BackgroundColor="#E0F0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0F0FF">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#E0F0FF">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <!-- Soft Purples -->
+                <Button BackgroundColor="#EDE0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#EDE0FF">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#EDE0FF">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button BackgroundColor="#F5E8FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#F5E8FF">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Note.BackgroundColor}" Value="#F5E8FF">
+                            <Setter Property="BorderColor" Value="Black" />
+                            <Setter Property="BorderWidth" Value="3" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </HorizontalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

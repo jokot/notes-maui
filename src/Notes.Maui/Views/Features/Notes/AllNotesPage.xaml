@@ -33,7 +33,7 @@
                     x:Name="notesCollection"
                     AutomationId="NotesCollection"
                     ItemsSource="{Binding FilteredNotes}"
-                    Margin="20"
+                     Margin="4,8,4,20"
                     SelectionMode="None">
 
                 <CollectionView.EmptyView>
@@ -57,7 +57,7 @@
                 <!-- Designate how the collection of items are laid out -->
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical"
-                                       ItemSpacing="10"/>
+                                       ItemSpacing="4"/>
                 </CollectionView.ItemsLayout>
 
                 <!-- Define the appearance of each item in the list -->
@@ -127,7 +127,7 @@
                                        AutomationId="NoteText"
                                        FontSize="14"
                                        TextColor="Gray"
-                                       MaxLines="2"
+                                        MaxLines="10"
                                        LineBreakMode="TailTruncation"/>
                                 <Label Text="{Binding UpdatedAt}"
                                        AutomationId="NoteDate"

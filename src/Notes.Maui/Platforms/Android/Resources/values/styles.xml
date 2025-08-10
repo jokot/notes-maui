@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="Maui.SplashTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnSecondary">#000000</item>
+        
+        <!-- Status bar and navigation bar colors -->
+        <!-- Use transparent colors to avoid deprecated setStatusBarColor/setNavigationBarColor -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        
+        <!-- Force edge-to-edge display using modern approach -->
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        
+        <!-- Enable drawing behind system bars -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        
+        <!-- Ensure proper window flags for Android 15+ -->
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+    </style>
+    
+    <!-- Main application theme -->
+    <style name="MainTheme" parent="Maui.SplashTheme">
+        <!-- Customize your theme here -->
+    </style>
+</resources>

@@ -13,6 +13,7 @@
             
             <!-- Converters -->
             <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
+            <converters:CountToBoolConverter x:Key="CountToBoolConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

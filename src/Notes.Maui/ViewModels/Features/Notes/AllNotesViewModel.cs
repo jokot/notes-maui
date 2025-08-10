@@ -111,6 +111,8 @@ public partial class AllNotesViewModel : BaseViewModel
         });
     }
     
+    
+    
     [RelayCommand]
     async Task DeleteNote(Note note)
     {

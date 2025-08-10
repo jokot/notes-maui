@@ -1,4 +1,6 @@
-﻿namespace Notes;
+using Notes.Maui.Views;
+
+namespace Notes;
 
 public partial class AppShell : Shell
 {

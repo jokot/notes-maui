@@ -1,3 +1,8 @@
+using System.Collections.ObjectModel;
+using Notes.Core.Commands;
+using Notes.Core.Models;
+using Notes.Core.Queries;
+
 namespace Notes.Maui.ViewModels.Features.Notes;
 
 [QueryProperty(nameof(Note), nameof(Note))]
@@ -7,6 +12,21 @@ public partial class NoteViewModel : BaseViewModel
     private readonly IMediator _mediator;
 
     private readonly string _initialNoteId;
+
+    [ObservableProperty]
+    private ObservableCollection<Tag> noteTags = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Tag> availableTags = new();
+
+    [ObservableProperty]
+    private bool isTagsLoaded;
+
+    [ObservableProperty]
+    private bool isBackgroundColorBottomSheetVisible;
+
+    [ObservableProperty]
+    private bool isTagsBottomSheetVisible;
 
     public NoteViewModel(
         IMediator mediator,
@@ -80,6 +100,12 @@ public partial class NoteViewModel : BaseViewModel
                 
                 // Update the current note with saved data
                 Note = savedNote;
+                
+                // Load tags after saving if not already loaded
+                if (!IsTagsLoaded)
+                {
+                    await LoadTagsAsync();
+                }
             }
             await NavigationService.GoBackAsync();
         }, nameof(SaveNote));
@@ -120,6 +146,129 @@ public partial class NoteViewModel : BaseViewModel
         {
             Note.BackgroundColor = color;
             OnPropertyChanged(nameof(Note));
+            IsBackgroundColorBottomSheetVisible = false;
         }
+    }
+
+    [RelayCommand]
+    void ShowBackgroundColorBottomSheet()
+    {
+        IsBackgroundColorBottomSheetVisible = true;
+    }
+
+    [RelayCommand]
+    void HideBackgroundColorBottomSheet()
+    {
+        IsBackgroundColorBottomSheetVisible = false;
+    }
+
+    [RelayCommand]
+    void ShowTagsBottomSheet()
+    {
+        IsTagsBottomSheetVisible = true;
+        if (!IsTagsLoaded)
+        {
+            _ = LoadTagsAsync();
+        }
+    }
+
+    [RelayCommand]
+    void HideTagsBottomSheet()
+    {
+        IsTagsBottomSheetVisible = false;
+    }
+
+    [RelayCommand]
+    async Task LoadTagsAsync()
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (Note == null) return;
+
+            // Load tags for this note
+            var noteTagsQuery = new GetTagsByNoteIdQuery(Note.Id);
+            var noteTagsResult = await _mediator.Send(noteTagsQuery);
+            
+            NoteTags.Clear();
+            foreach (var tag in noteTagsResult)
+            {
+                NoteTags.Add(tag);
+            }
+
+            // Load all available tags
+            var allTagsQuery = new GetAllTagsQuery();
+            var allTagsResult = await _mediator.Send(allTagsQuery);
+            
+            AvailableTags.Clear();
+            foreach (var tag in allTagsResult)
+            {
+                AvailableTags.Add(tag);
+            }
+
+            IsTagsLoaded = true;
+        }, "Loading tags");
+    }
+
+    [RelayCommand]
+    async Task AddTagToNoteAsync(Tag tag)
+    {
+        if (Note == null || tag == null) return;
+
+        await ExecuteAsync(async () =>
+        {
+            var command = new AddTagToNoteCommand(Note.Id, tag.Id);
+            var success = await _mediator.Send(command);
+            
+            if (success && !NoteTags.Any(t => t.Id == tag.Id))
+            {
+                NoteTags.Add(tag);
+            }
+        }, "Adding tag to note");
+    }
+
+    [RelayCommand]
+    async Task RemoveTagFromNoteAsync(Tag tag)
+    {
+        if (Note == null || tag == null) return;
+
+        await ExecuteAsync(async () =>
+        {
+            var command = new RemoveTagFromNoteCommand(Note.Id, tag.Id);
+            var success = await _mediator.Send(command);
+            
+            if (success)
+            {
+                var existingTag = NoteTags.FirstOrDefault(t => t.Id == tag.Id);
+                if (existingTag != null)
+                {
+                    NoteTags.Remove(existingTag);
+                }
+            }
+        }, "Removing tag from note");
+    }
+
+    [RelayCommand]
+    async Task CreateAndAddTagAsync(string tagName)
+    {
+        if (Note == null || string.IsNullOrWhiteSpace(tagName)) return;
+
+        await ExecuteAsync(async () =>
+        {
+            // First create the tag
+            var createCommand = new CreateTagCommand(tagName.Trim());
+            var createdTag = await _mediator.Send(createCommand);
+            
+            if (createdTag != null)
+            {
+                // Add to available tags if not already there
+                if (!AvailableTags.Any(t => t.Id == createdTag.Id))
+                {
+                    AvailableTags.Add(createdTag);
+                }
+                
+                // Add to note
+                await AddTagToNoteAsync(createdTag);
+            }
+        }, "Creating and adding tag");
     }
 }

@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
 
         // Repositories - Use SQLite repository as the primary implementation
         services.AddScoped<IRepository<Note>, SqliteNoteRepository>();
+        services.AddScoped<ITagRepository, SqliteTagRepository>();
 
         return services;
     }

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
+             xmlns:models="clr-namespace:Notes.Core.Models;assembly=Notes.Core"
              x:Class="Notes.Maui.Views.Features.Notes.NotePage"
              AutomationId="PageTitle"
              Title="{Binding Title}"
@@ -25,7 +26,120 @@
                     MaxLength="200"
                     BackgroundColor="Transparent" />
         </Frame>
-        
+        <!-- Bottom Sheet Overlay Layer -->
+        <Grid x:Name="BottomSheetOverlay" Grid.RowSpan="3" IsVisible="False" ZIndex="1000" BackgroundColor="Transparent">
+            <!-- Scrim -->
+            <BoxView x:Name="OverlayScrim" BackgroundColor="#80000000" Opacity="0" ZIndex="1001" />
+
+            <!-- Background Color Bottom Sheet -->
+            <Border x:Name="BackgroundSheet"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=Black}"
+                    Opacity="1"
+                    TranslationY="500"
+                    VerticalOptions="End"
+                    Padding="20"
+                    ZIndex="1002"
+                    IsVisible="False"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22,22,0,0">
+                <Border.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnBackgroundSheetPanUpdated" />
+                </Border.GestureRecognizers>
+                <StackLayout>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+                        <Label Grid.Column="0" Text="Background Color" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="×" FontSize="20" BackgroundColor="Transparent" Command="{Binding HideBackgroundColorBottomSheetCommand}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" RowSpacing="15" ColumnSpacing="15">
+                        <Button Grid.Row="0" Grid.Column="0" BackgroundColor="#FFFFFF" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="2" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFFF" />
+                        <Button Grid.Row="0" Grid.Column="1" BackgroundColor="#FFE0E0" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0E0" />
+                        <Button Grid.Row="0" Grid.Column="2" BackgroundColor="#E0FFE0" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0FFE0" />
+                        <Button Grid.Row="1" Grid.Column="0" BackgroundColor="#E0E0FF" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0E0FF" />
+                        <Button Grid.Row="1" Grid.Column="1" BackgroundColor="#FFFFE0" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFE0" />
+                        <Button Grid.Row="1" Grid.Column="2" BackgroundColor="#FFE0FF" WidthRequest="60" HeightRequest="60" CornerRadius="30" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0FF" />
+                    </Grid>
+                </StackLayout>
+            </Border>
+
+            <!-- Tags Bottom Sheet -->
+            <Border x:Name="TagsSheet"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=Black}"
+                    Opacity="1"
+                    TranslationY="500"
+                    VerticalOptions="End"
+                    Padding="20"
+                    ZIndex="1002"
+                    IsVisible="False"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22,22,0,0">
+                <Border.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnTagsSheetPanUpdated" />
+                </Border.GestureRecognizers>
+                <ScrollView x:Name="TagsScroll">
+                    <StackLayout>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+                            <Label Grid.Column="0" Text="Tags" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="×" FontSize="20" BackgroundColor="Transparent" Command="{Binding HideTagsBottomSheetCommand}" />
+                        </Grid>
+
+                        <!-- Current Tags -->
+                        <Label Text="Current Tags" FontSize="16" FontAttributes="Bold" Margin="0,0,0,10" IsVisible="{Binding NoteTags.Count, Converter={StaticResource CountToBoolConverter}}" />
+                        <CollectionView ItemsSource="{Binding NoteTags}" IsVisible="{Binding NoteTags.Count, Converter={StaticResource CountToBoolConverter}}">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Tag">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="8,4">
+                                        <Label Grid.Column="0" Text="✓" FontSize="14" TextColor="Green" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding Name}" FontSize="14" VerticalOptions="Center" Margin="8,0" />
+                                        <Button Grid.Column="2" Text="×" FontSize="16" TextColor="Red" BackgroundColor="Transparent" Padding="4" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:NoteViewModel}}, Path=RemoveTagFromNoteCommand}" CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Add New Tag -->
+                        <Label Text="Add New Tag" FontSize="16" FontAttributes="Bold" Margin="0,20,0,10" />
+                        <StackLayout Orientation="Horizontal" Spacing="8">
+                            <Entry x:Name="NewTagEntry"
+                                   Placeholder="Tag name..."
+                                   WidthRequest="200"
+                                   FontSize="14"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding CreateAndAddTagCommand}"
+                                   ReturnCommandParameter="{Binding Source={x:Reference NewTagEntry}, Path=Text}" />
+                            <Button Text="Add"
+                                    FontSize="14"
+                                    WidthRequest="60"
+                                    HeightRequest="40"
+                                    CornerRadius="8"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                    TextColor="White"
+                                    Command="{Binding CreateAndAddTagCommand}"
+                                    CommandParameter="{Binding Source={x:Reference NewTagEntry}, Path=Text}" />
+                        </StackLayout>
+
+                        <!-- Available Tags -->
+                        <Label Text="Available Tags" FontSize="16" FontAttributes="Bold" Margin="0,20,0,10" IsVisible="{Binding AvailableTags.Count, Converter={StaticResource CountToBoolConverter}}" />
+                        <CollectionView ItemsSource="{Binding AvailableTags}" IsVisible="{Binding AvailableTags.Count, Converter={StaticResource CountToBoolConverter}}">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Tag">
+                                    <Grid ColumnDefinitions="Auto,*" Padding="8,4">
+                                        <Button Grid.Column="0" Text="+" FontSize="16" TextColor="Blue" BackgroundColor="Transparent" Padding="4" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:NoteViewModel}}, Path=AddTagToNoteCommand}" CommandParameter="{Binding .}" />
+                                        <Label Grid.Column="1" Text="{Binding Name}" FontSize="14" VerticalOptions="Center" Margin="8,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+                </ScrollView>
+            </Border>
+        </Grid>
         <Frame Grid.Row="1" CornerRadius="15" BorderColor="Gray" HasShadow="False" Padding="10" BackgroundColor="{Binding Note.BackgroundColor}">
             <Editor x:Name="TextEditor"
                     AutomationId="NoteEditor"
@@ -34,15 +148,31 @@
                     BackgroundColor="Transparent" />
         </Frame>
         
-        <!-- Color Picker Section -->
-        <StackLayout Grid.Row="2" Orientation="Horizontal" HorizontalOptions="Center" Spacing="10" Margin="0,10,0,0">
-            <Label Text="Background:" VerticalOptions="Center" FontSize="14" />
-            <Button BackgroundColor="#FFFFFF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFFF" />
-            <Button BackgroundColor="#FFE0E0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0E0" />
-            <Button BackgroundColor="#E0FFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0FFE0" />
-            <Button BackgroundColor="#E0E0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#E0E0FF" />
-            <Button BackgroundColor="#FFFFE0" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFFFE0" />
-            <Button BackgroundColor="#FFE0FF" WidthRequest="30" HeightRequest="30" CornerRadius="15" BorderWidth="1" BorderColor="Gray" Command="{Binding SetBackgroundColorCommand}" CommandParameter="#FFE0FF" />
-        </StackLayout>
+        <!-- Horizontal Menu Section -->
+        <Frame Grid.Row="2" CornerRadius="20" BorderColor="Gray" HasShadow="True" Padding="15" BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray900}}" Margin="10,0">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="40">
+                <!-- Paint Icon for Background Color -->
+                <Button Text="🎨"
+                        FontSize="24"
+                        BackgroundColor="Transparent"
+                        BorderWidth="0"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        Command="{Binding ShowBackgroundColorBottomSheetCommand}"
+                        ToolTipProperties.Text="Background Color" />
+                
+                <!-- Tag Icon for Tags -->
+                <Button Text="🏷️"
+                        FontSize="24"
+                        BackgroundColor="Transparent"
+                        BorderWidth="0"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        Command="{Binding ShowTagsBottomSheetCommand}"
+                        ToolTipProperties.Text="Tags" />
+            </StackLayout>
+        </Frame>
+        
+        
     </Grid>
 </ContentPage>

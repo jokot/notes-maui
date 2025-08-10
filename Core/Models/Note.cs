@@ -1,16 +1,14 @@
-namespace Notes.Models;
+namespace Notes.Core.Models;
 
-public class Note
+public class Note : BaseEntity
 {
-    public string Filename { get; set; }
-    public string Text { get; set; }
-    public DateTime Date { get; set; }
+    public string Filename { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+    public DateTime Date { get; set; } = DateTime.Now;
 
     public Note()
     {
         Filename = GenerateUniqueFilename();
-        Text = string.Empty;
-        Date = DateTime.Now;
     }
 
     private static string GenerateUniqueFilename()

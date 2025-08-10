@@ -2,8 +2,8 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:viewmodels="clr-namespace:Notes.ViewModels"
-    xmlns:models="clr-namespace:Notes.Models"
+    xmlns:viewmodels="clr-namespace:Notes.Core.ViewModels"
+    xmlns:models="clr-namespace:Notes.Core.Models"
     x:Class="Notes.Views.AllNotesPage"
     Title="{Binding Title}"
     x:DataType="viewmodels:AllNotesViewModel">

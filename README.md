@@ -1,6 +1,6 @@
-# Notes MAUI App
+# notto
 
-A cross-platform note-taking application built with .NET MAUI, demonstrating modern mobile development patterns and MVVM architecture with smart caching.
+notto is a cross-platform note-taking application built with .NET MAUI, demonstrating modern mobile development patterns and MVVM architecture with smart caching.
 
 ## 📱 Project Overview
 

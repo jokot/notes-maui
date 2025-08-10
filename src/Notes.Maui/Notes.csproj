@@ -21,10 +21,10 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>Notes</ApplicationTitle>
+		<ApplicationTitle>notto</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.notes</ApplicationId>
+		<ApplicationId>com.jktdeveloper.notto</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -70,6 +70,16 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Notes.Core\Notes.Core.csproj" />
 	</ItemGroup>
+
+	<!-- Android Release signing configuration -->
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net9.0-android'">
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+		<AndroidSigningKeyStore>/Users/jokot/Documents/podifi/try/Notes/keystores/notto-release.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>notto_release</AndroidSigningKeyAlias>
+		<AndroidSigningStorePass>$(ANDROID_SIGNING_STORE_PASS)</AndroidSigningStorePass>
+		<AndroidSigningKeyPass>$(ANDROID_SIGNING_KEY_PASS)</AndroidSigningKeyPass>
+	</PropertyGroup>
 
 	<ItemGroup>
 	  <Folder Include="Views/Features/" />

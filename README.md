@@ -2,6 +2,12 @@
 
 notto is a cross-platform note-taking application built with .NET MAUI, demonstrating modern mobile development patterns and MVVM architecture with smart caching.
 
+## 📱 Download
+
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.jktdeveloper.notto)
+
+*Available on Google Play Store*
+
 ## 📱 Project Overview
 
 This project serves as a learning foundation for building enterprise-grade mobile applications, specifically preparing for POS (Point of Sale) system development. It showcases best practices in mobile app architecture, data management, and testing strategies.

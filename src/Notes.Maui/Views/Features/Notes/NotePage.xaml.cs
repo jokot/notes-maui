@@ -23,10 +23,13 @@ public partial class NotePage : ContentPage
 			{
 				Glyph = "✕",
 				FontFamily = "Default",
-				Color = Colors.Black,
+				Color = Application.Current?.RequestedTheme == AppTheme.Dark ? Colors.White : Colors.Black,
 				Size = 20,
 			}
 		};
+		
+		// Subscribe to theme changes to update delete button color
+		Application.Current!.RequestedThemeChanged += OnThemeChanged;
 		_deleteToolbarItem.SetBinding(ToolbarItem.CommandProperty, new Binding(nameof(NoteViewModel.DeleteNoteCommand)));
 		
 		// Subscribe to property changes
@@ -62,9 +65,19 @@ public partial class NotePage : ContentPage
 		}
 	}
 
+	private void OnThemeChanged(object? sender, AppThemeChangedEventArgs e)
+	{
+		// Update delete button color when theme changes
+		if (_deleteToolbarItem.IconImageSource is FontImageSource fontImageSource)
+		{
+			fontImageSource.Color = e.RequestedTheme == AppTheme.Dark ? Colors.White : Colors.Black;
+		}
+	}
+
 	protected override void OnDisappearing()
 	{
 		base.OnDisappearing();
 		_viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+		Application.Current!.RequestedThemeChanged -= OnThemeChanged;
 	}
 }

@@ -13,7 +13,6 @@ public class AppConstants
     {
         public const string AllNotesPage = nameof(AllNotesPage);
         public const string NotePage = nameof(NotePage);
-        public const string AboutPage = nameof(AboutPage);
     }
     public static class Cache
     {

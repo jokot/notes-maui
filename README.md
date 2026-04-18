@@ -61,7 +61,7 @@ Notes/
 - **Async/Await**: Proper asynchronous programming throughout
 
 ### Cross-Platform Support
-- **Android**: API 21+ (Android 5.0+)
+- **Android**: API 21+ (Android 5.0+), target API 36
 - **iOS**: iOS 15.0+
 - **macOS**: macCatalyst 15.0+
 - **Windows**: Windows 10 version 1903 (build 10.0.17763.0)+
@@ -70,7 +70,7 @@ Notes/
 ## 🛠️ Technical Stack
 
 ### Core Framework
-- **.NET 9**: Latest framework version
+- **.NET 10**: Latest framework version
 - **.NET MAUI**: Cross-platform UI framework
 - **CommunityToolkit.Mvvm**: MVVM framework with source generators
 
@@ -95,11 +95,12 @@ Notes/
 
 ### Prerequisites
 - Visual Studio 2022 (17.8+) or Visual Studio Code with C# extension
-- .NET 9 SDK
+- .NET 10 SDK (10.0.202+)
 - Platform-specific SDKs:
-  - Android SDK (API 21+)
-  - Xcode 15+ (for iOS/macOS development)
+  - Android SDK (API 21+, target API 36)
+  - Xcode 26.3+ (for iOS/macOS development)
   - Windows SDK 10.0.17763.0+ (for Windows development)
+- Install MAUI workloads: `sudo dotnet workload restore`
 
 ### Building the Application
 
@@ -122,16 +123,16 @@ Notes/
 4. **Run on specific platform**
    ```bash
    # Android
-   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-android
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net10.0-android
    
    # iOS Simulator
-   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-ios
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net10.0-ios
    
    # macOS
-   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-maccatalyst
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net10.0-maccatalyst
    
    # Windows
-   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net9.0-windows10.0.19041.0
+   dotnet build src/Notes.Maui/Notes.csproj -t:Run -f net10.0-windows10.0.19041.0
    ```
 
 ### Running Tests

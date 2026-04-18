@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
              x:Class="Notes.Maui.Views.Features.Notes.NotePage"
+             x:DataType="viewmodels:NoteViewModel"
              AutomationId="PageTitle"
              Title="{Binding Title}"
              >

@@ -49,10 +49,10 @@ Our testing strategy follows the **Test Pyramid** approach, ensuring fast feedba
 ## 🚀 Running Tests
 
 ### Prerequisites
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - For Integration Tests: SQLite support (included with .NET)
 - For UI Tests: iOS Simulator or Android Emulator
-- Visual Studio 2022 (17.8+) or Visual Studio Code with C# extension
+- Visual Studio 2022 (17.12+) or Visual Studio Code with C# extension
 
 ### Quick Commands
 

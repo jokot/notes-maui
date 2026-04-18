@@ -70,7 +70,8 @@
                             <!-- Left swipe actions -->
                             <SwipeView.LeftItems>
                                 <SwipeItems>
-                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
+                                    <SwipeItemView x:DataType="{x:Null}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
                                                    CommandParameter="{Binding .}">
                                         <Frame BackgroundColor="#81C784" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
                                             <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
@@ -86,7 +87,8 @@
                             <!-- Right swipe actions -->
                             <SwipeView.RightItems>
                                 <SwipeItems>
-                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
+                                    <SwipeItemView x:DataType="{x:Null}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
                                                    CommandParameter="{Binding .}">
                                         <Frame BackgroundColor="#EF5350" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
                                             <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
@@ -102,6 +104,7 @@
                             <Frame AutomationId="NoteItem" Padding="10" Margin="5" BackgroundColor="{Binding BackgroundColor}" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False">
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer
+                                        x:DataType="{x:Null}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
                                         CommandParameter="{Binding .}"/>
                                 </Frame.GestureRecognizers>

@@ -90,3 +90,6 @@ msbuild.log
 
 # User-specific files
 *.rsuser
+
+# Credential files
+**/keystores/

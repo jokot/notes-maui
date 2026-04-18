@@ -22,7 +22,7 @@ public static class EdgeToEdgeHelper
                                        WindowManagerFlags.LayoutInScreen | WindowManagerFlags.LayoutInsetDecor);
                 
                 // Use modern display cutout mode (replaces deprecated LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES)
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.P) // API 28+
+                if (OperatingSystem.IsAndroidVersionAtLeast(28)) // API 28+
                 {
                     var layoutParams = activity.Window.Attributes;
                     if (layoutParams != null)

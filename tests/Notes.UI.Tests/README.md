@@ -101,10 +101,10 @@ emulator -avd TestDevice
 ### 3. Build Notes App for Android
 ```bash
 # From project root
-dotnet build src/Notes.Maui/Notes.csproj -f net9.0-android -c Release
+dotnet build src/Notes.Maui/Notes.csproj -f net10.0-android -c Release
 
 # The APK will be at:
-# src/Notes.Maui/bin/Release/net9.0-android/com.companyname.notes-Signed.apk
+# src/Notes.Maui/bin/Release/net10.0-android/com.jktdeveloper.notto-Signed.apk
 ```
 
 ## 🍎 iOS Setup (macOS Only)
@@ -134,10 +134,10 @@ xcrun simctl boot "Test iPhone"
 ### 3. Build Notes App for iOS
 ```bash
 # From project root
-dotnet build src/Notes.Maui/Notes.csproj -f net9.0-ios -c Release
+dotnet build src/Notes.Maui/Notes.csproj -f net10.0-ios -c Release
 
 # The app will be at:
-# src/Notes.Maui/bin/Release/net9.0-ios/iossimulator-arm64/Notes.app
+# src/Notes.Maui/bin/Release/net10.0-ios/iossimulator-arm64/Notes.app
 ```
 
 ## ⚙️ Configuration
@@ -148,12 +148,12 @@ Edit `tests/Notes.UI.Tests/appsettings.json`:
 ```json
 {
   "Android": {
-    "AppPath": "../../../src/Notes.Maui/bin/Release/net9.0-android/com.companyname.notes-Signed.apk",
-    "AppPackage": "com.companyname.notes"
+    "AppPath": "../../../src/Notes.Maui/bin/Release/net10.0-android/com.jktdeveloper.notto-Signed.apk",
+    "AppPackage": "com.jktdeveloper.notto"
   },
   "iOS": {
-    "AppPath": "../../../src/Notes.Maui/bin/Release/net9.0-ios/iossimulator-arm64/Notes.app",
-    "BundleId": "com.companyname.notes"
+    "AppPath": "../../../src/Notes.Maui/bin/Release/net10.0-ios/iossimulator-arm64/Notes.app",
+    "BundleId": "com.jktdeveloper.notto"
   }
 }
 ```
@@ -305,8 +305,8 @@ appium server --port 4723
 **App not found:**
 ```bash
 # Verify app path in appsettings.json
-ls -la src/Notes.Maui/bin/Release/net9.0-android/
-ls -la src/Notes.Maui/bin/Release/net9.0-ios/
+ls -la src/Notes.Maui/bin/Release/net10.0-android/
+ls -la src/Notes.Maui/bin/Release/net10.0-ios/
 ```
 
 **Element not found:**
@@ -410,7 +410,7 @@ jobs:
           npm install -g appium
           appium driver install uiautomator2
       - name: Build Android App
-        run: dotnet build src/Notes.Maui/Notes.csproj -f net9.0-android -c Release
+        run: dotnet build src/Notes.Maui/Notes.csproj -f net10.0-android -c Release
       - name: Start Appium
         run: appium server --port 4723 &
       - name: Run Smoke Tests
@@ -435,7 +435,7 @@ jobs:
           npm install -g appium
           appium driver install uiautomator2
       - name: Build Android App
-        run: dotnet build src/Notes.Maui/Notes.csproj -f net9.0-android -c Release
+        run: dotnet build src/Notes.Maui/Notes.csproj -f net10.0-android -c Release
       - name: Start Appium
         run: appium server --port 4723 &
       - name: Run Regression Tests

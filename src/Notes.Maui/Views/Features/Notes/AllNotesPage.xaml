@@ -2,158 +2,204 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                 xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
+    xmlns:viewmodels="clr-namespace:Notes.Maui.ViewModels.Features.Notes"
     xmlns:models="clr-namespace:Notes.Core.Models;assembly=Notes.Core"
     x:Class="Notes.Maui.Views.Features.Notes.AllNotesPage"
     AutomationId="PageTitle"
     Title="{Binding Title}"
     x:DataType="viewmodels:AllNotesViewModel">
-    <!-- Add an item to the toolbar -->
+
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Add"
                      AutomationId="AddNoteButton"
                      Command="{Binding AddNoteCommand}">
             <ToolbarItem.IconImageSource>
-                <FontImageSource Glyph="+" Size="22" Color="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                <FontImageSource Glyph="&#xe145;" FontFamily="MaterialIcons" Size="24"
+                                 Color="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
-    <StackLayout>
-        <SearchBar Placeholder="Search notes..."
-                   Text="{Binding SearchText}"
-                   BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
-                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"
-                   Margin="10,5" />
-        
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Search bar with card background -->
+        <Frame Grid.Row="0"
+               Margin="12,8,12,4"
+               Padding="0"
+               CornerRadius="12"
+               BorderColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
+               BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+            <SearchBar Placeholder="Search notes..."
+                       Text="{Binding SearchText}"
+                       Margin="0" />
+        </Frame>
+
         <RefreshView
+            Grid.Row="1"
             AutomationId="RefreshButton"
             Command="{Binding RefreshNotesCommand}"
             IsRefreshing="{Binding IsRefreshing}">
             <Grid>
-                <!-- Display notes in a list -->
                 <CollectionView
                     x:Name="notesCollection"
                     AutomationId="NotesCollection"
                     ItemsSource="{Binding FilteredNotes}"
-                     Margin="4,8,4,20"
+                    Margin="8,4,8,16"
                     SelectionMode="None">
 
-                <CollectionView.EmptyView>
-                    <StackLayout VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Spacing="20">
-                        <Label Text="No notes available"
-                               FontSize="20"
-                               HorizontalOptions="Center"/>
-                        <Button Text="+ Add Note"
-                                AutomationId="EmptyStateAddButton"
-                                Command="{Binding AddNoteCommand}"
-                                HorizontalOptions="Center"
-                                BackgroundColor="Transparent"
-                                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                                BorderWidth="0"
-                                FontSize="16"/>
-                    </StackLayout>
-                </CollectionView.EmptyView>
+                    <CollectionView.EmptyView>
+                        <StackLayout VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="12"
+                                     Padding="32,0">
+                            <Label Text="&#xe873;"
+                                   FontFamily="MaterialIcons"
+                                   FontSize="56"
+                                   TextColor="{StaticResource Tertiary}"
+                                   HorizontalOptions="Center" />
+                            <Label Text="No notes yet"
+                                   FontFamily="PlusJakartaSansBold"
+                                   FontSize="20"
+                                   TextColor="{AppThemeBinding Light={StaticResource OnSurface}, Dark={StaticResource Gray200}}"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Tap + to create your first note"
+                                   FontSize="14"
+                                   TextColor="{StaticResource Gray500}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center" />
+                            <Button Text="Create note"
+                                    AutomationId="EmptyStateAddButton"
+                                    Command="{Binding AddNoteCommand}"
+                                    HorizontalOptions="Center"
+                                    Margin="0,8,0,0"
+                                    Padding="24,0"
+                                    HeightRequest="44"
+                                    CornerRadius="22"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    TextColor="White"
+                                    FontFamily="PlusJakartaSansSemiBold"
+                                    FontSize="15" />
+                        </StackLayout>
+                    </CollectionView.EmptyView>
 
-                <!-- Designate how the collection of items are laid out -->
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical"
-                                       ItemSpacing="4"/>
-                </CollectionView.ItemsLayout>
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
+                    </CollectionView.ItemsLayout>
 
-                <!-- Define the appearance of each item in the list -->
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Note">
-                        <SwipeView>
-                            <!-- Left swipe actions -->
-                            <SwipeView.LeftItems>
-                                <SwipeItems>
-                                    <SwipeItemView x:DataType="{x:Null}"
-                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
-                                                   CommandParameter="{Binding .}">
-                                        <Frame BackgroundColor="#81C784" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
-                                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
-                                                <Label Text="📌" FontSize="20" TextColor="White" HorizontalOptions="Center" />
-                                                <Label Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}" 
-                                                       FontSize="10" TextColor="White" HorizontalOptions="Center" />
-                                            </StackLayout>
-                                        </Frame>
-                                    </SwipeItemView>
-                                </SwipeItems>
-                            </SwipeView.LeftItems>
-                            
-                            <!-- Right swipe actions -->
-                            <SwipeView.RightItems>
-                                <SwipeItems>
-                                    <SwipeItemView x:DataType="{x:Null}"
-                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
-                                                   CommandParameter="{Binding .}">
-                                        <Frame BackgroundColor="#EF5350" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False" Margin="5" Padding="10" HeightRequest="80" WidthRequest="80" VerticalOptions="FillAndExpand">
-                                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="3">
-                                                <Label Text="🗑️" FontSize="20" TextColor="White" HorizontalOptions="Center" />
-                                                <Label Text="Delete" FontSize="10" TextColor="White" HorizontalOptions="Center" />
-                                            </StackLayout>
-                                        </Frame>
-                                    </SwipeItemView>
-                                </SwipeItems>
-                            </SwipeView.RightItems>
-                            
-                            <!-- Main content -->
-                            <Frame AutomationId="NoteItem" Padding="10" Margin="5" BackgroundColor="{Binding BackgroundColor}" CornerRadius="15" BorderColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource White}}" HasShadow="False">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        x:DataType="{x:Null}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
-                                        CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
-                                <StackLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Note">
+                            <SwipeView>
+                                <!-- Left: pin -->
+                                <SwipeView.LeftItems>
+                                    <SwipeItems>
+                                        <SwipeItemView x:DataType="{x:Null}"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=TogglePinCommand}"
+                                                       CommandParameter="{Binding .}">
+                                            <Frame BackgroundColor="{StaticResource Primary}"
+                                                   CornerRadius="14" BorderColor="Transparent" HasShadow="False"
+                                                   Margin="4,2" Padding="0"
+                                                   HeightRequest="80" WidthRequest="72"
+                                                   VerticalOptions="FillAndExpand">
+                                                <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                                                    <Label Text="&#xf10d;" FontFamily="MaterialIcons"
+                                                           FontSize="22" TextColor="White" HorizontalOptions="Center" />
+                                                    <Label Text="{Binding IsPinned, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Unpin|Pin'}"
+                                                           FontSize="10" TextColor="White" HorizontalOptions="Center" />
+                                                </StackLayout>
+                                            </Frame>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <Label Text="{Binding Title}"
-                                           AutomationId="NoteTitle"
-                                           FontSize="18"
-                                           FontAttributes="Bold"
-                                            Grid.Column="0"
-                                            TextColor="Black" />
-                                    
-                                    <Label Text="📌"
-                                           FontSize="16"
-                                           IsVisible="{Binding IsPinned}"
-                                           Grid.Column="1"
-                                           VerticalOptions="Start" />
-                                </Grid>
-                                
-                                <Label Text="{Binding Text}"
-                                       AutomationId="NoteText"
-                                       FontSize="14"
-                                        TextColor="Black"
-                                        MaxLines="10"
-                                       LineBreakMode="TailTruncation"/>
-                                <Label Text="{Binding UpdatedAt}"
-                                       AutomationId="NoteDate"
-                                       FontSize="12"
-                                        TextColor="Gray"/>
-                                </StackLayout>
-                            </Frame>
-                        </SwipeView>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                <!-- Right: delete -->
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItemView x:DataType="{x:Null}"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=DeleteNoteCommand}"
+                                                       CommandParameter="{Binding .}">
+                                            <Frame BackgroundColor="#DC2626"
+                                                   CornerRadius="14" BorderColor="Transparent" HasShadow="False"
+                                                   Margin="4,2" Padding="0"
+                                                   HeightRequest="80" WidthRequest="72"
+                                                   VerticalOptions="FillAndExpand">
+                                                <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                                                    <Label Text="&#xe872;" FontFamily="MaterialIcons"
+                                                           FontSize="22" TextColor="White" HorizontalOptions="Center" />
+                                                    <Label Text="Delete"
+                                                           FontSize="10" TextColor="White" HorizontalOptions="Center" />
+                                                </StackLayout>
+                                            </Frame>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
 
-            <ActivityIndicator
-                IsVisible="{Binding IsBusy}"
-                IsRunning="{Binding IsBusy}"
-                Color="{StaticResource Primary}"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"/>
+                                <!-- Note card -->
+                                <Frame AutomationId="NoteItem"
+                                       Padding="14,12"
+                                       Margin="0,0"
+                                       BackgroundColor="{Binding BackgroundColor}"
+                                       CornerRadius="14"
+                                       BorderColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
+                                       HasShadow="False">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            x:DataType="{x:Null}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AllNotesViewModel}}, Path=GoToNoteCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
+                                    <StackLayout Spacing="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Text="{Binding Title}"
+                                                   AutomationId="NoteTitle"
+                                                   FontFamily="PlusJakartaSansBold"
+                                                   FontSize="16"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   Grid.Column="0"
+                                                   TextColor="Black" />
+                                            <Label Text="&#xf10d;"
+                                                   FontFamily="MaterialIcons"
+                                                   FontSize="15"
+                                                   TextColor="{StaticResource Primary}"
+                                                   IsVisible="{Binding IsPinned}"
+                                                   Grid.Column="1"
+                                                   Margin="6,0,0,0"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+
+                                        <Label Text="{Binding Text}"
+                                               AutomationId="NoteText"
+                                               FontSize="14"
+                                               TextColor="#444444"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation"
+                                               IsVisible="{Binding Text, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+
+                                        <Label Text="{Binding UpdatedAt}"
+                                               AutomationId="NoteDate"
+                                               FontSize="11"
+                                               Margin="0,2,0,0"
+                                               TextColor="{StaticResource Gray400}" />
+                                    </StackLayout>
+                                </Frame>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <ActivityIndicator
+                    IsVisible="{Binding IsBusy}"
+                    IsRunning="{Binding IsBusy}"
+                    Color="{StaticResource Primary}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
             </Grid>
         </RefreshView>
-    </StackLayout>
+
+    </Grid>
 </ContentPage>

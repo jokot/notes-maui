@@ -13,7 +13,20 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+				fonts.AddFont("PlusJakartaSans-Regular.ttf", "PlusJakartaSansRegular");
+				fonts.AddFont("PlusJakartaSans-SemiBold.ttf", "PlusJakartaSansSemiBold");
+				fonts.AddFont("PlusJakartaSans-Bold.ttf", "PlusJakartaSansBold");
+				fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
 			});
+
+		// Remove Android Editor underline (bottom border on EditText)
+#if ANDROID
+		Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("RemoveUnderline", (handler, view) =>
+		{
+			handler.PlatformView.BackgroundTintList =
+				Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+		});
+#endif
 
 		// Register Core Services with platform-specific data directory
 		builder.Services.AddCoreServices(FileSystem.AppDataDirectory);

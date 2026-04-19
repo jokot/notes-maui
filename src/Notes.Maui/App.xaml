@@ -13,6 +13,7 @@
             
             <!-- Converters -->
             <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
+            <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
